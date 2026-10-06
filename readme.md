@@ -128,24 +128,6 @@ Through this project, I gained experience in:
 
 ---
 
-## 👨‍💻 Author
-
-**Sangram Sachin Pardhe**
-
-📧 Email: sangramparadhe2006@gmail.com
-
-🔗 LinkedIn:https://www.linkedin.com/in/sangram-pardhe-0404a3317/
-
-💻 GitHub: https://github.com/SangramPardhe
 
 ---
 
-## ⭐ Acknowledgements
-
-This project was developed as part of my Data Science and Machine Learning learning journey.
-
----
-
-## 📄 License
-
-This project is intended for educational and learning purposes.
