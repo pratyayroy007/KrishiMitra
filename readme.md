@@ -63,8 +63,7 @@ KrushiMitra/
 
 
 ⚙️ Installation and Setup
-Clone the Repository
-git clone https://github.com/SangramPardhe/KrushiMitra.git
+
 Navigate to Project Folder
 cd KrushiMitra
 Install Required Libraries
