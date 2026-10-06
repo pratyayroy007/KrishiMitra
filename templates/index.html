@@ -39,22 +39,92 @@
     <!-- MAIN CONTENT CONTAINER -->
     <main class="main-wrapper">
 
-        <!-- WEATHER & CLIMATE QUICK-FILL BAR -->
+        <!-- WEATHER & AGRO-CLIMATE INTELLIGENCE SECTION (Open-Meteo) -->
         <section class="weather-bar-card">
             <div class="weather-bar-content">
                 <div class="weather-info">
-                    <span class="weather-icon">⛅</span>
+                    <span class="weather-icon" id="mainWeatherIcon">⛅</span>
                     <div>
-                        <strong>Live Agro-Weather Auto-Fill</strong>
-                        <p>Auto-detect local temperature, humidity, and rainfall so you don't have to guess!</p>
+                        <strong>Live Agro-Climate Intelligence <span class="tag-open-meteo">POWERED BY OPEN-METEO</span></strong>
+                        <p>Real-time hyper-local temperature, humidity, rainfall & 5-day farming advisory</p>
                     </div>
                 </div>
                 <div class="weather-controls">
-                    <input type="text" id="cityInput" placeholder="Enter District / City (e.g. Pune, Ludhiana)" class="form-input city-input">
+                    <input type="text" id="cityInput" placeholder="District / City (e.g. Pune, Ludhiana)" class="form-input city-input" value="Pune">
                     <button type="button" class="btn btn-secondary" onclick="fetchWeatherByCity()">Fetch Weather</button>
                     <button type="button" class="btn btn-outline" onclick="detectGPSLocation()">📍 Detect GPS</button>
                 </div>
             </div>
+
+            <!-- Quick Indian Agricultural City Chips -->
+            <div class="quick-cities-bar">
+                <span class="quick-cities-label">Quick Select:</span>
+                <button type="button" class="city-chip" onclick="quickSelectCity('Pune')">Pune (Maharashtra)</button>
+                <button type="button" class="city-chip" onclick="quickSelectCity('Ludhiana')">Ludhiana (Punjab)</button>
+                <button type="button" class="city-chip" onclick="quickSelectCity('Nagpur')">Nagpur (Vidarbha)</button>
+                <button type="button" class="city-chip" onclick="quickSelectCity('Vellore')">Vellore (Tamil Nadu)</button>
+                <button type="button" class="city-chip" onclick="quickSelectCity('Patna')">Patna (Bihar)</button>
+                <button type="button" class="city-chip" onclick="quickSelectCity('Guntur')">Guntur (Andhra)</button>
+            </div>
+
+            <!-- Detailed Weather & Forecast Panel (Populated dynamically) -->
+            <div id="weatherDetailCard" class="weather-detail-card" style="display: none;">
+                <div class="weather-detail-header">
+                    <div class="weather-detail-left">
+                        <span id="detailWeatherIcon" class="weather-huge-icon">☀️</span>
+                        <div>
+                            <div class="weather-temp-row">
+                                <span id="detailTemp" class="weather-temp-num">--°C</span>
+                                <span id="detailDesc" class="weather-desc-pill">Clear Sky</span>
+                            </div>
+                            <p id="detailLocation" class="weather-loc-text">Pune, Maharashtra</p>
+                        </div>
+                    </div>
+                    <div class="weather-detail-stats">
+                        <div class="stat-box">
+                            <span class="stat-label">Relative Humidity</span>
+                            <strong id="detailHumidity">--%</strong>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Growing Rainfall</span>
+                            <strong id="detailRainfall">-- mm</strong>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Wind Velocity</span>
+                            <strong id="detailWind">-- km/h</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agricultural Advisory Banners -->
+                <div class="advisory-grid">
+                    <div class="advisory-card" id="sprayingCard">
+                        <span class="advisory-title" id="sprayingTitle">🧪 Spraying Advisory</span>
+                        <p id="sprayingMsg" class="advisory-text">Loading...</p>
+                    </div>
+                    <div class="advisory-card" id="irrigationCard">
+                        <span class="advisory-title" id="irrigationTitle">💧 Irrigation Advisory</span>
+                        <p id="irrigationMsg" class="advisory-text">Loading...</p>
+                    </div>
+                </div>
+
+                <!-- 5-Day Forecast Strip -->
+                <div class="forecast-section">
+                    <span class="forecast-title">5-Day Agricultural Forecast</span>
+                    <div class="forecast-strip" id="forecastStrip">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="weather-card-actions">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="applyWeatherToForm()">
+                        ⚡ Auto-Fill This Climate into Crop Form
+                    </button>
+                    <span id="applyToast" class="apply-toast" style="display: none;">✓ Parameters injected into form!</span>
+                </div>
+            </div>
+
             <div id="weatherStatus" class="weather-status" style="display: none;"></div>
         </section>
 
@@ -373,26 +443,34 @@
         let activeCropContext = '{{ prediction }}';
 
         // -------------------------------------------------------------
-        // WEATHER AUTO-FETCH
+        // WEATHER & AGRO-CLIMATE INTELLIGENCE (Open-Meteo)
         // -------------------------------------------------------------
+        let currentWeatherData = null;
+
+        function quickSelectCity(city) {
+            document.getElementById('cityInput').value = city;
+            fetchWeatherByCity();
+        }
+
         async function fetchWeatherByCity() {
             const city = document.getElementById('cityInput').value.trim();
             if (!city) {
                 alert('Please enter a district or city name.');
                 return;
             }
-            showWeatherStatus('Fetching live weather for ' + city + '...', 'info');
+            showWeatherStatus('Fetching live Open-Meteo climate data for ' + city + '...', 'info');
             try {
                 const res = await fetch(`/api/weather?city=${encodeURIComponent(city)}`);
                 const data = await res.json();
                 if (data.status === 'success') {
-                    populateWeatherFields(data);
-                    showWeatherStatus(`✓ Live weather for ${data.city}: ${data.temperature}°C, ${data.humidity}% Humidity, ${data.rainfall}mm Rainfall`, 'success');
+                    currentWeatherData = data;
+                    renderWeatherCard(data);
+                    showWeatherStatus(`✓ Live Open-Meteo data loaded for ${data.city}${data.admin_region ? ', ' + data.admin_region : ''}`, 'success');
                 } else {
-                    showWeatherStatus('Error: ' + (data.error || 'Failed to fetch weather'), 'error');
+                    showWeatherStatus('Error: ' + (data.message || data.error || 'Failed to fetch weather'), 'error');
                 }
             } catch (err) {
-                showWeatherStatus('Network error fetching weather', 'error');
+                showWeatherStatus('Network error fetching Open-Meteo weather', 'error');
             }
         }
 
@@ -409,8 +487,9 @@
                     const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
                     const data = await res.json();
                     if (data.status === 'success') {
-                        populateWeatherFields(data);
-                        showWeatherStatus(`✓ GPS Climate Auto-Filled (${lat.toFixed(2)}°, ${lon.toFixed(2)}°): ${data.temperature}°C, ${data.humidity}% Humidity`, 'success');
+                        currentWeatherData = data;
+                        renderWeatherCard(data);
+                        showWeatherStatus(`✓ GPS Climate detected (${lat.toFixed(2)}°, ${lon.toFixed(2)}°)`, 'success');
                     }
                 } catch (e) {
                     showWeatherStatus('Error fetching GPS weather data', 'error');
@@ -420,10 +499,69 @@
             });
         }
 
-        function populateWeatherFields(data) {
-            document.getElementById('temperature').value = data.temperature;
-            document.getElementById('humidity').value = data.humidity;
-            document.getElementById('rainfall').value = data.rainfall;
+        function renderWeatherCard(data) {
+            const card = document.getElementById('weatherDetailCard');
+            card.style.display = 'block';
+
+            // Main Stats
+            document.getElementById('mainWeatherIcon').innerText = data.weather_icon || '⛅';
+            document.getElementById('detailWeatherIcon').innerText = data.weather_icon || '☀️';
+            document.getElementById('detailTemp').innerText = `${data.temperature}°C`;
+            document.getElementById('detailDesc').innerText = data.weather_desc || 'Clear';
+            document.getElementById('detailLocation').innerText = `${data.city}${data.admin_region ? ', ' + data.admin_region : ''}`;
+
+            document.getElementById('detailHumidity').innerText = `${data.humidity}%`;
+            document.getElementById('detailRainfall').innerText = `${data.rainfall} mm`;
+            document.getElementById('detailWind').innerText = `${data.wind_speed_kmh} km/h`;
+
+            // Advisories
+            if (data.advisory) {
+                document.getElementById('sprayingTitle').innerText = `🧪 Spraying: ${data.advisory.spraying_status}`;
+                document.getElementById('sprayingMsg').innerText = data.advisory.spraying_msg;
+
+                document.getElementById('irrigationTitle').innerText = `💧 Irrigation: ${data.advisory.irrigation_status}`;
+                document.getElementById('irrigationMsg').innerText = data.advisory.irrigation_msg;
+            }
+
+            // 5-Day Forecast Strip
+            const strip = document.getElementById('forecastStrip');
+            strip.innerHTML = '';
+            if (data.forecast && data.forecast.length > 0) {
+                data.forecast.forEach(day => {
+                    const d = new Date(day.date);
+                    const dayName = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                    const col = document.createElement('div');
+                    col.className = 'forecast-pill';
+                    col.innerHTML = `
+                        <span class="forecast-day">${dayName}</span>
+                        <span class="forecast-icon">${day.icon}</span>
+                        <span class="forecast-temp">${Math.round(day.max_temp)}° / ${Math.round(day.min_temp)}°</span>
+                        <span class="forecast-rain">${day.rain_mm > 0 ? '🌧️ ' + day.rain_mm + 'mm' : 'Dry'}</span>
+                    `;
+                    strip.appendChild(col);
+                });
+            }
+
+            // Auto-populate the form directly
+            applyWeatherToForm();
+        }
+
+        function applyWeatherToForm() {
+            if (!currentWeatherData) return;
+            document.getElementById('temperature').value = currentWeatherData.temperature;
+            document.getElementById('humidity').value = currentWeatherData.humidity;
+            document.getElementById('rainfall').value = currentWeatherData.rainfall;
+
+            // Highlight animation on input fields
+            ['temperature', 'humidity', 'rainfall'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('input-highlight');
+                setTimeout(() => el.classList.remove('input-highlight'), 1200);
+            });
+
+            const toast = document.getElementById('applyToast');
+            toast.style.display = 'inline-block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
         function showWeatherStatus(msg, type) {
@@ -432,6 +570,11 @@
             el.className = 'weather-status ' + type;
             el.innerText = msg;
         }
+
+        // Auto-fetch on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchWeatherByCity();
+        });
 
         // -------------------------------------------------------------
         // CAMERA MODAL (Adapted from Caterpillar InCabCameraFeed)

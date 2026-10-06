@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Import the integrated Copilot and Disease Detection services
 from services.chatbot_service import copilot_service
 from services.disease_service import disease_service
+from services.weather_service import weather_service
 
 app = Flask(__name__)
 
@@ -95,44 +95,13 @@ def api_scan_leaf():
 # -------------------------------------------------------------
 @app.route('/api/weather', methods=['GET'])
 def api_weather():
-    city = request.args.get('city', '').strip()
-    lat = request.args.get('lat', '')
-    lon = request.args.get('lon', '')
+    city = request.args.get('city', None)
+    lat = request.args.get('lat', None, type=float)
+    lon = request.args.get('lon', None, type=float)
 
-    try:
-        # If city name is provided, geocode it
-        if city and (not lat or not lon):
-            geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en&format=json"
-            geo_res = requests.get(geo_url, timeout=5).json()
-            if not geo_res.get('results'):
-                return jsonify({"error": f"City '{city}' not found"}), 404
-            lat = geo_res['results'][0]['latitude']
-            lon = geo_res['results'][0]['longitude']
-            city_name = geo_res['results'][0]['name']
-        else:
-            city_name = "Detected Location"
-
-        if not lat or not lon:
-            return jsonify({"error": "Latitude/Longitude or City required"}), 400
-
-        weather_url = (
-            f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
-            f"&current=temperature_2m,relative_humidity_2m,precipitation&timezone=auto"
-        )
-        w_res = requests.get(weather_url, timeout=5).json()
-        current = w_res.get('current', {})
-
-        return jsonify({
-            "status": "success",
-            "city": city_name,
-            "latitude": lat,
-            "longitude": lon,
-            "temperature": current.get('temperature_2m', 25.0),
-            "humidity": current.get('relative_humidity_2m', 65.0),
-            "rainfall": current.get('precipitation', 100.0)
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    result = weather_service.get_weather(city=city, lat=lat, lon=lon)
+    status_code = 200 if result.get('status') == 'success' else 400
+    return jsonify(result), status_code
 
 
 if __name__ == '__main__':
