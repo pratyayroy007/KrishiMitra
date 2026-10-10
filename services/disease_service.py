@@ -193,6 +193,13 @@ DEFAULT_DISEASE_REMEDIES = {
 }
 
 
+from services.translation_service import (
+    get_localized_disease_info,
+    SUPPORTED_LANGUAGES,
+    get_prompt_language_instruction
+)
+
+
 class CropDiseaseService:
     def __init__(self):
         self.device = torch.device('cpu')
@@ -260,8 +267,11 @@ class CropDiseaseService:
                 logger.warning(f"Failed to init Gemini Vision client: {e}")
                 self.client = None
 
-    def analyze_image_base64(self, b64_data: str) -> Dict[str, Any]:
-        """Analyzes a base64 encoded JPEG/PNG frame from the camera."""
+    def analyze_image_base64(self, b64_data: str, lang: str = "en") -> Dict[str, Any]:
+        """Analyzes a base64 encoded JPEG/PNG frame from the camera with regional localization."""
+        lang = lang.lower() if lang else "en"
+        if lang not in SUPPORTED_LANGUAGES:
+            lang = "en"
         try:
             if "," in b64_data:
                 header, raw_b64 = b64_data.split(",", 1)
@@ -283,7 +293,7 @@ class CropDiseaseService:
                 class_key = self.class_indices.get(pred_idx_str, list(DEFAULT_DISEASE_REMEDIES.keys())[pred_idx.item() % 20])
                 conf_pct = int(round(conf.item() * 100))
 
-                remedy_info = self.remedies.get(class_key, {
+                raw_remedy = self.remedies.get(class_key, {
                     "crop": "Field Crop",
                     "condition": "Foliar Anomaly",
                     "diagnosis": class_key.replace("___", " - ").replace("_", " "),
@@ -291,6 +301,8 @@ class CropDiseaseService:
                     "treatment": "Apply broad-spectrum systemic fungicide/bactericide and balance irrigation.",
                     "prevention": "Maintain proper field hygiene and certified seed stock."
                 })
+
+                remedy_info = get_localized_disease_info(class_key, raw_remedy, lang)
 
                 return {
                     "crop_name": remedy_info.get("crop", "Field Crop"),
@@ -301,12 +313,14 @@ class CropDiseaseService:
                     "treatment": remedy_info.get("treatment", ""),
                     "prevention": remedy_info.get("prevention", ""),
                     "source": "Krishi Mitra MobileNetV3 (20-Class PyTorch Deep Learning)",
-                    "status": "success"
+                    "status": "success",
+                    "lang": lang
                 }
 
             # 2. Try Gemini Multimodal Vision if client is available
             if self.client:
                 try:
+                    lang_inst = get_prompt_language_instruction(lang)
                     prompt = (
                         "You are an expert plant pathologist and agronomist for Indian agriculture. "
                         "Analyze this plant or leaf image carefully. "
@@ -318,11 +332,12 @@ class CropDiseaseService:
                         "\"symptoms\" (brief 1-2 sentence description of visible lesions/spots), "
                         "\"treatment\" (immediate actionable chemical/organic treatment, e.g. fungicide or neem oil with dosage), "
                         "\"prevention\" (cultural practices to prevent recurrence). "
-                        "Respond ONLY with valid JSON."
+                        "Respond ONLY with valid JSON.\n"
+                        f"{lang_inst}"
                     )
 
                     response = self.client.models.generate_content(
-                        model="gemini-2.5-flash",
+                        model="gemini-3.8-flash",
                         contents=[prompt, img],
                         config={
                             "response_mime_type": "application/json",
@@ -334,21 +349,32 @@ class CropDiseaseService:
                     data = json.loads(text_res)
                     data["source"] = "Gemini Vision AI (Live Optical Pathology)"
                     data["status"] = "success"
+                    data["lang"] = lang
                     return data
                 except Exception as e:
                     logger.warning(f"Gemini Vision inference error: {e}. Using expert fallback.")
 
             # 3. Fallback Heuristic
-            return {
-                "crop_name": "Tomato / Solanaceous Crop",
+            fallback_raw = self.remedies.get("Tomato___Early_blight", {
+                "crop": "Tomato",
                 "condition": "Fungal Infection",
                 "diagnosis": "Tomato Early Blight (Alternaria solani)",
-                "confidence_percent": 93,
                 "symptoms": "Concentric target-board rings surrounded by chlorotic yellow halo on leaf lamina.",
                 "treatment": "Spray Mancozeb 75% WP @ 2.5 g/L or Azoxystrobin 23% SC @ 1 mL/L water.",
-                "prevention": "Prune lower infected suckers, mulch soil surface, avoid overhead wetting.",
+                "prevention": "Prune lower infected suckers, mulch soil surface, avoid overhead wetting."
+            })
+            loc_fallback = get_localized_disease_info("Tomato___Early_blight", fallback_raw, lang)
+            return {
+                "crop_name": loc_fallback.get("crop", "Tomato"),
+                "condition": loc_fallback.get("condition", "Fungal Infection"),
+                "diagnosis": loc_fallback.get("diagnosis", "Tomato Early Blight"),
+                "confidence_percent": 93,
+                "symptoms": loc_fallback.get("symptoms", ""),
+                "treatment": loc_fallback.get("treatment", ""),
+                "prevention": loc_fallback.get("prevention", ""),
                 "source": "Krishi Mitra Computer Vision Engine (Agronomic Fallback)",
-                "status": "success"
+                "status": "success",
+                "lang": lang
             }
 
         except Exception as e:

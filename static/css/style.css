@@ -1383,3 +1383,133 @@ body {
     0% { border-color: var(--leaf-lime); box-shadow: 0 0 14px var(--accent-green); background-color: #173827; }
     100% { border-color: var(--border-color); box-shadow: none; background-color: var(--bg-main); }
 }
+
+/* ============================================================== */
+/* 🌐 REGIONAL LANGUAGE SELECTOR & VOICE MODULE STYLES */
+/* ============================================================== */
+.lang-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.lang-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(23, 45, 34, 0.85);
+    border: 1px solid var(--border-highlight);
+    color: var(--text-primary);
+    padding: 9px 32px 9px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.lang-select:hover, .lang-select:focus {
+    border-color: var(--accent-green);
+    background: rgba(28, 56, 42, 0.95);
+    box-shadow: 0 0 12px rgba(46, 196, 182, 0.25);
+}
+
+.lang-select-arrow {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+    font-size: 10px;
+    color: var(--accent-green);
+}
+
+/* MICROPHONE VOICE BUTTON */
+.btn-mic {
+    background: rgba(23, 45, 34, 0.9);
+    border: 1px solid var(--border-highlight);
+    color: var(--text-primary);
+    font-size: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-mic:hover {
+    background: rgba(46, 196, 182, 0.2);
+    border-color: var(--accent-green);
+    transform: scale(1.05);
+}
+
+.btn-mic.mic-active {
+    background: rgba(230, 57, 70, 0.25);
+    border-color: var(--accent-red);
+    box-shadow: 0 0 15px rgba(230, 57, 70, 0.6);
+    animation: pulseRecording 1.5s infinite;
+}
+
+@keyframes pulseRecording {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.7); }
+    70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(230, 57, 70, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 57, 70, 0); }
+}
+
+/* TEXT TO SPEECH READOUT BUTTON */
+.btn-speech {
+    background: rgba(46, 196, 182, 0.1);
+    border: 1px solid rgba(46, 196, 182, 0.3);
+    color: var(--accent-green);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+    margin-top: 6px;
+}
+
+.btn-speech:hover {
+    background: rgba(46, 196, 182, 0.25);
+    border-color: var(--accent-green);
+    transform: translateY(-1px);
+}
+
+.btn-speech.speaking {
+    background: rgba(224, 159, 62, 0.2);
+    border-color: var(--accent-amber);
+    color: var(--accent-amber);
+    animation: speechPulse 1.2s infinite;
+}
+
+@keyframes speechPulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+/* DISEASE DIAGNOSIS VOICE BAR */
+.diagnosis-voice-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    margin-top: 10px;
+    background: rgba(18, 36, 27, 0.6);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.diagnosis-voice-bar span {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+

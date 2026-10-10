@@ -107,6 +107,13 @@ AGRICULTURAL_KNOWLEDGE_BASE = {
 }
 
 
+from services.translation_service import (
+    get_prompt_language_instruction,
+    get_localized_kb_entry,
+    SUPPORTED_LANGUAGES
+)
+
+
 class KrishiMitraCopilotService:
     def __init__(self):
         self.client = None
@@ -122,12 +129,24 @@ class KrishiMitraCopilotService:
                 logger.warning(f"Failed to initialize GenAI client: {e}")
                 self.client = None
 
-    def answer_query(self, query: str, crop_context: Optional[str] = None) -> Dict[str, Any]:
-        """Processes agricultural query and returns response, tags, and action items."""
+    def answer_query(self, query: str, crop_context: Optional[str] = None, lang: str = "en") -> Dict[str, Any]:
+        """Processes agricultural query and returns response, tags, and action items in requested language."""
         clean_q = query.strip()
+        lang = lang.lower() if lang else "en"
+        if lang not in SUPPORTED_LANGUAGES:
+            lang = "en"
+
         if not clean_q:
+            empty_msg = {
+                "en": "Please enter an agricultural question regarding crops, soil health, fertilizers, or diseases.",
+                "hi": "कृपया फसलों, मिट्टी के स्वास्थ्य, उर्वरकों या रोगों के बारे में एक कृषि प्रश्न दर्ज करें।",
+                "bn": "অনুগ্রহ করে ফসল, মাটির স্বাস্থ্য, সার বা রোগ সম্পর্কিত একটি কৃষি প্রশ্ন জিজ্ঞাসা করুন।",
+                "te": "దయచేసి పంటలు, భూసారం, ఎరువులు లేదా తెగుళ్ళకు సంబంధించి ఒక వ్యవసాయ ప్రశ్నను అడగండి.",
+                "mr": "कृपया पिके, मातीचे आरोग्य, खते किंवा रोगांविषयी एक कृषी प्रश्न विचारा.",
+                "ta": "பயிர்கள், மண் வளம், உரங்கள் அல்லது நோய்கள் பற்றிய வேளாண் கேள்வியைக் கேட்கவும்."
+            }
             return {
-                "response": "Please enter an agricultural question regarding crops, soil health, fertilizers, or diseases.",
+                "response": empty_msg.get(lang, empty_msg["en"]),
                 "context_tags": ["#KrishiMitra"],
                 "action_recommendation": None,
                 "model": "rule-based"
@@ -136,43 +155,63 @@ class KrishiMitraCopilotService:
         # 1. Try Gemini GenAI if configured
         if self.client:
             try:
+                lang_instruction = get_prompt_language_instruction(lang)
                 system_instruction = (
                     "You are 'Krishi Mitra AI Copilot', an expert agricultural extension advisor for Indian farmers. "
                     "Your advice is grounded in ICAR (Indian Council of Agricultural Research), Package-of-Practices (PoP), "
                     "and integrated pest/soil management guidelines. "
                     "Provide practical, scientific, yet easy-to-understand advice. "
                     "Include: (1) Main explanation, (2) Key Actionable Steps, (3) Mention safe dosages and non-chemical IPM options where relevant. "
-                    "Keep answers concise, direct, and farmer-friendly."
+                    "Keep answers concise, direct, and farmer-friendly.\n\n"
+                    f"{lang_instruction}"
                 )
 
                 prompt = f"Farmer Query: {clean_q}"
                 if crop_context:
                     prompt += f"\nActive Recommended Crop: {crop_context}"
 
-                response = self.client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt,
-                    config={
-                        "system_instruction": system_instruction,
-                        "temperature": 0.3,
-                        "max_output_tokens": 600,
-                    }
-                )
+                import concurrent.futures
+
+                def _call_gemini():
+                    return self.client.models.generate_content(
+                        model="gemini-3.8-flash",
+                        contents=prompt,
+                        config={
+                            "system_instruction": system_instruction,
+                            "temperature": 0.3,
+                            "max_output_tokens": 600,
+                        }
+                    )
+
+                executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+                try:
+                    future = executor.submit(_call_gemini)
+                    response = future.result(timeout=2.5)
+                finally:
+                    executor.shutdown(wait=False, cancel_futures=True)
 
                 text = response.text or ""
                 # Extract tags and recommendations heuristically
                 tags = ["#KrishiMitra", "#PoPAdvisory"]
-                if "rice" in clean_q.lower() or "paddy" in clean_q.lower(): tags.append("#Paddy")
-                if "wheat" in clean_q.lower(): tags.append("#Wheat")
-                if "fertilizer" in clean_q.lower() or "npk" in clean_q.lower(): tags.append("#NutrientManagement")
-                if "disease" in clean_q.lower() or "leaf" in clean_q.lower(): tags.append("#CropProtection")
-                if "weather" in clean_q.lower() or "rain" in clean_q.lower(): tags.append("#AgroClimate")
+                if "rice" in clean_q.lower() or "धान" in clean_q or "ধান" in clean_q or "వరి" in clean_q: tags.append("#Paddy")
+                if "wheat" in clean_q.lower() or "गेहूं" in clean_q or "গম" in clean_q: tags.append("#Wheat")
+                if "fertilizer" in clean_q.lower() or "npk" in clean_q.lower() or "खाद" in clean_q or "সার" in clean_q: tags.append("#NutrientManagement")
+                if "disease" in clean_q.lower() or "रोग" in clean_q or "রোগ" in clean_q or "తెగులు" in clean_q: tags.append("#CropProtection")
+
+                action_notes = {
+                    "en": "Consult local Krishi Vigyan Kendra (KVK) or package of practices for region-specific micro-variations.",
+                    "hi": "क्षेत्र-विशिष्ट सूक्ष्म विविधताओं के लिए स्थानीय कृषि विज्ञान केंद्र (KVK) से परामर्श लें।",
+                    "bn": "অঞ্চলভিত্তিক সুনির্দিষ্ট পরামর্শের জন্য স্থানীয় কৃষি বিজ্ঞান কেন্দ্র (KVK)-এর সাথে যোগাযোগ করুন।",
+                    "te": "ప్రాంతీయ నిర్దిష్ట సలహాల కోసం స్థానిక కృషి విజ్ఞాన కేంద్రం (KVK) ని సంప్రదించండి.",
+                    "mr": "स्थानिक सूक्ष्म हवामान बदलांसाठी स्थानिक कृषी विज्ञान केंद्राशी (KVK) संपर्क साधा.",
+                    "ta": "மண்டல அளவிலான மாற்றங்களுக்கு உங்கள் உள்ளூர் வேளாண் அறிவியல் மையத்தை (KVK) அணுகவும்."
+                }
 
                 return {
                     "response": text,
                     "context_tags": tags,
-                    "action_recommendation": "Consult local Krishi Vigyan Kendra (KVK) or package of practices for region-specific micro-variations.",
-                    "model": "gemini-2.5-flash (Live GenAI)",
+                    "action_recommendation": action_notes.get(lang, action_notes["en"]),
+                    "model": "gemini-3.8-flash (Live GenAI)",
                     "status": "success"
                 }
             except Exception as e:
@@ -182,24 +221,63 @@ class KrishiMitraCopilotService:
         q_lower = clean_q.lower()
         for key, entry in AGRICULTURAL_KNOWLEDGE_BASE.items():
             if any(k in q_lower for k in entry["keywords"]):
+                loc_entry = get_localized_kb_entry(key, entry, lang)
                 return {
-                    "response": entry["answer"],
+                    "response": loc_entry["answer"],
                     "context_tags": [f"#{t}" for t in entry["context_tags"]],
-                    "action_recommendation": entry["action_recommendation"],
+                    "action_recommendation": loc_entry["action_recommendation"],
                     "model": "KrishiMitra Agricultural Knowledge Base (PoP)",
                     "status": "success"
                 }
 
         # 3. Intelligent default response
-        return {
-            "response": (
+        default_responses = {
+            "en": (
                 f"Thank you for consulting Krishi Mitra regarding '{clean_q}'. "
                 "For optimal crop productivity, we recommend maintaining soil organic carbon above 0.5%, "
                 "performing seasonal soil health card testing, and adhering to certified seed rates and spacing. "
                 "You can also use our Crop Recommendation tool and Field Camera scanner above to diagnose specific symptoms."
             ),
+            "hi": (
+                f"'{clean_q}' के संबंध में कृषि मित्र से संपर्क करने के लिए धन्यवाद। "
+                "उत्तम फसल उत्पादकता के लिए, हम मिट्टी में जैविक कार्बन 0.5% से ऊपर बनाए रखने, "
+                "नियमित मृदा स्वास्थ्य कार्ड (Soil Health Card) परीक्षण कराने और प्रमाणित बीजों का उचित दूरी पर उपयोग करने की सलाह देते हैं।"
+            ),
+            "bn": (
+                f"'{clean_q}' সংক্রান্ত জিজ্ঞাসার জন্য কৃষি মিত্রকে ধন্যবাদ। "
+                "সর্বোত্তম ফলনের জন্য মাটির জৈব কার্বন ০.৫% এর ওপরে রাখা, নিয়মিত মাটি পরীক্ষা করানো "
+                "এবং প্রত্যয়িত বীজের সঠিক দূরত্বে বপন নিশ্চিত করার পরামর্শ দেওয়া হচ্ছে।"
+            ),
+            "te": (
+                f"'{clean_q}' గురించి కృషి మిత్రను సంప్రదించినందుకు ధన్యవాదాలు. "
+                "ఉత్తమ దిగుబడి కోసం భూమిలో సేంద్రీయ కర్బనాన్ని 0.5% కంటే ఎక్కువగా ఉంచడం, "
+                "భూసార పరీక్షలు చేయించడం మరియు నాణ్యమైన విత్తనాలను సరైన దూరంలో నాటడం అవసరం."
+            ),
+            "mr": (
+                f"'{clean_q}' बाबत कृषी मित्राचा सल्ला घेतल्याबद्दल धन्यवाद. "
+                "उत्कृष्ट उत्पादनासाठी जमिनीतील सेंद्रिय कर्ब ०.५% पेक्षा जास्त ठेवणे, "
+                "माती परीक्षण करणे आणि प्रमाणित बियाण्यांचा योग्य अंतरावर वापर करणे आवश्यक आहे."
+            ),
+            "ta": (
+                f"'{clean_q}' குறித்த கேள்விக்கு நன்றி. "
+                "சிறந்த விளைச்சலுக்கு மண்ணில் கரிம கார்பன் அளவை 0.5% மேல் பராமரித்தல், "
+                "மண் பரிசோதனை அட்டை பெறுதல் மற்றும் சான்றளிக்கப்பட்ட விதைகளைப் பயன்படுத்துவது அவசியமாகும்."
+            )
+        }
+
+        default_actions = {
+            "en": "Perform a standard soil test (N, P, K, Organic Carbon, pH) before applying basal fertilizers.",
+            "hi": "उर्वरक देने से पहले मिट्टी की मानक जांच (N, P, K, जैविक कार्बन, pH) अवश्य करवाएं।",
+            "bn": "সার প্রয়োগের পূর্বে মাটির সাধারণ স্বাস্থ্য পরীক্ষা (N, P, K, জৈব কার্বন, pH) করিয়ে নিন।",
+            "te": "ఎరువులు వేయడానికి ముందు ప్రాథమిక భూసార పరీక్ష (N, P, K, pH) చేయించుకోండి.",
+            "mr": "रासायनिक खते देण्यापूर्वी मातीची मूलभूत तपासणी (N, P, K, pH) करून घ्यावी.",
+            "ta": "உரமிடுவதற்கு முன் மண்ணின் அடிப்படை பரிசோதனையை (N, P, K, pH) செய்து கொள்ளவும்."
+        }
+
+        return {
+            "response": default_responses.get(lang, default_responses["en"]),
             "context_tags": ["#KrishiMitra", "#GeneralAdvisory", "#SoilHealth"],
-            "action_recommendation": "Perform a standard soil test (N, P, K, Organic Carbon, pH) before applying basal fertilizers.",
+            "action_recommendation": default_actions.get(lang, default_actions["en"]),
             "model": "KrishiMitra Agronomic Expert",
             "status": "success"
         }

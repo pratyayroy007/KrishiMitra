@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
 </head>
 <body>
 
@@ -18,19 +19,32 @@
             <div class="nav-brand">
                 <div class="brand-badge">KM</div>
                 <div>
-                    <h1 class="brand-title">Krishi Mitra <span class="tag">AI EXTENSION AGENT</span></h1>
-                    <p class="brand-subtitle">Smart Crop Intelligence • Computer Vision • PoP Advisory</p>
+                    <h1 class="brand-title"><span id="brandTitleText">Krishi Mitra</span> <span id="brandTag" class="tag">AI EXTENSION AGENT</span></h1>
+                    <p id="brandSubtitle" class="brand-subtitle">Smart Crop Intelligence • Computer Vision • PoP Advisory</p>
                 </div>
             </div>
             <div class="nav-actions">
+                <!-- Regional Language Switcher -->
+                <div class="lang-select-wrapper" title="Select Regional Language / क्षेत्रीय भाषा चुनें">
+                    <select id="langSelector" class="lang-select" onchange="changeLanguage(this.value)">
+                        <option value="en">🇬🇧 English</option>
+                        <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+                        <option value="bn">🇮🇳 বাংলা (Bengali)</option>
+                        <option value="te">🇮🇳 తెలుగు (Telugu)</option>
+                        <option value="mr">🇮🇳 मराठी (Marathi)</option>
+                        <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+                    </select>
+                    <span class="lang-select-arrow">▼</span>
+                </div>
+
                 <button type="button" class="btn btn-camera" onclick="openCameraModal()">
                     <span class="icon">📷</span>
-                    <span>Field Camera Scanner</span>
-                    <span class="badge-live">LIVE</span>
+                    <span id="navBtnCameraText">Field Camera Scanner</span>
+                    <span id="navBtnLiveText" class="badge-live">LIVE</span>
                 </button>
                 <button type="button" class="btn btn-copilot" onclick="toggleCopilot(true)">
                     <span class="icon">🤖</span>
-                    <span>AI Agri Copilot</span>
+                    <span id="navBtnCopilotText">AI Agri Copilot</span>
                 </button>
             </div>
         </div>
@@ -45,20 +59,20 @@
                 <div class="weather-info">
                     <span class="weather-icon" id="mainWeatherIcon">⛅</span>
                     <div>
-                        <strong>Live Agro-Climate Intelligence <span class="tag-open-meteo">POWERED BY OPEN-METEO</span></strong>
-                        <p>Real-time hyper-local temperature, humidity, rainfall & 5-day farming advisory</p>
+                        <strong id="weatherBarTitle">Live Agro-Climate Intelligence <span id="weatherBarTag" class="tag-open-meteo">POWERED BY OPEN-METEO</span></strong>
+                        <p id="weatherBarSubtitle">Real-time hyper-local temperature, humidity, rainfall & 5-day farming advisory</p>
                     </div>
                 </div>
                 <div class="weather-controls">
                     <input type="text" id="cityInput" placeholder="District / City (e.g. Pune, Ludhiana)" class="form-input city-input" value="Pune">
-                    <button type="button" class="btn btn-secondary" onclick="fetchWeatherByCity()">Fetch Weather</button>
-                    <button type="button" class="btn btn-outline" onclick="detectGPSLocation()">📍 Detect GPS</button>
+                    <button type="button" id="btnFetchWeather" class="btn btn-secondary" onclick="fetchWeatherByCity()">Fetch Weather</button>
+                    <button type="button" id="btnDetectGPS" class="btn btn-outline" onclick="detectGPSLocation()">📍 Detect GPS</button>
                 </div>
             </div>
 
             <!-- Quick Indian Agricultural City Chips -->
             <div class="quick-cities-bar">
-                <span class="quick-cities-label">Quick Select:</span>
+                <span id="quickCitiesLabel" class="quick-cities-label">Quick Select:</span>
                 <button type="button" class="city-chip" onclick="quickSelectCity('Pune')">Pune (Maharashtra)</button>
                 <button type="button" class="city-chip" onclick="quickSelectCity('Ludhiana')">Ludhiana (Punjab)</button>
                 <button type="button" class="city-chip" onclick="quickSelectCity('Nagpur')">Nagpur (Vidarbha)</button>
@@ -82,15 +96,15 @@
                     </div>
                     <div class="weather-detail-stats">
                         <div class="stat-box">
-                            <span class="stat-label">Relative Humidity</span>
+                            <span id="statLabelHumidity" class="stat-label">Relative Humidity</span>
                             <strong id="detailHumidity">--%</strong>
                         </div>
                         <div class="stat-box">
-                            <span class="stat-label">Growing Rainfall</span>
+                            <span id="statLabelRainfall" class="stat-label">Growing Rainfall</span>
                             <strong id="detailRainfall">-- mm</strong>
                         </div>
                         <div class="stat-box">
-                            <span class="stat-label">Wind Velocity</span>
+                            <span id="statLabelWind" class="stat-label">Wind Velocity</span>
                             <strong id="detailWind">-- km/h</strong>
                         </div>
                     </div>
@@ -110,7 +124,7 @@
 
                 <!-- 5-Day Forecast Strip -->
                 <div class="forecast-section">
-                    <span class="forecast-title">5-Day Agricultural Forecast</span>
+                    <span id="forecastTitleText" class="forecast-title">5-Day Agricultural Forecast</span>
                     <div class="forecast-strip" id="forecastStrip">
                         <!-- Injected via JS -->
                     </div>
@@ -118,7 +132,7 @@
 
                 <!-- Action Button -->
                 <div class="weather-card-actions">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="applyWeatherToForm()">
+                    <button type="button" id="btnAutoFillClimate" class="btn btn-primary btn-sm" onclick="applyWeatherToForm()">
                         ⚡ Auto-Fill This Climate into Crop Form
                     </button>
                     <span id="applyToast" class="apply-toast" style="display: none;">✓ Parameters injected into form!</span>
@@ -136,52 +150,52 @@
                 <div class="card-header">
                     <div class="card-header-icon">🌱</div>
                     <div>
-                        <h2>Smart Crop Recommendation</h2>
-                        <p>Powered by Random Forest Model & Agro-Meteorological Inputs</p>
+                        <h2 id="cropFormTitle">Smart Crop Recommendation</h2>
+                        <p id="cropFormSubtitle">Powered by Random Forest Model & Agro-Meteorological Inputs</p>
                     </div>
                 </div>
 
                 <form method="POST" action="/" class="prediction-form" id="cropForm">
-                    <div class="form-section-title">🧪 Soil Nutrient Profile (kg/ha)</div>
+                    <div id="soilSectionTitle" class="form-section-title">🧪 Soil Nutrient Profile (kg/ha)</div>
                     <div class="input-grid">
                         <div class="form-group">
-                            <label for="N">Nitrogen (N) <span class="unit">kg/ha</span></label>
+                            <label id="labelN" for="N">Nitrogen (N) <span class="unit">kg/ha</span></label>
                             <input type="number" step="any" id="N" name="N" placeholder="e.g. 90" value="{{ form_data.N }}" required class="form-input">
                         </div>
                         <div class="form-group">
-                            <label for="P">Phosphorus (P) <span class="unit">kg/ha</span></label>
+                            <label id="labelP" for="P">Phosphorus (P) <span class="unit">kg/ha</span></label>
                             <input type="number" step="any" id="P" name="P" placeholder="e.g. 42" value="{{ form_data.P }}" required class="form-input">
                         </div>
                         <div class="form-group">
-                            <label for="K">Potassium (K) <span class="unit">kg/ha</span></label>
+                            <label id="labelK" for="K">Potassium (K) <span class="unit">kg/ha</span></label>
                             <input type="number" step="any" id="K" name="K" placeholder="e.g. 43" value="{{ form_data.K }}" required class="form-input">
                         </div>
                         <div class="form-group">
-                            <label for="ph">Soil pH <span class="unit">(0 - 14)</span></label>
+                            <label id="labelPh" for="ph">Soil pH <span class="unit">(0 - 14)</span></label>
                             <input type="number" step="any" id="ph" name="ph" placeholder="e.g. 6.5" value="{{ form_data.ph }}" required class="form-input">
                         </div>
                     </div>
 
-                    <div class="form-section-title">🌦️ Climate & Atmospheric Conditions</div>
+                    <div id="climateSectionTitle" class="form-section-title">🌦️ Climate & Atmospheric Conditions</div>
                     <div class="input-grid">
                         <div class="form-group">
-                            <label for="temperature">Temperature <span class="unit">°C</span></label>
+                            <label id="labelTemp" for="temperature">Temperature <span class="unit">°C</span></label>
                             <input type="number" step="any" id="temperature" name="temperature" placeholder="e.g. 24.5" value="{{ form_data.temperature }}" required class="form-input">
                         </div>
                         <div class="form-group">
-                            <label for="humidity">Humidity <span class="unit">%</span></label>
+                            <label id="labelHumidity" for="humidity">Humidity <span class="unit">%</span></label>
                             <input type="number" step="any" id="humidity" name="humidity" placeholder="e.g. 78.0" value="{{ form_data.humidity }}" required class="form-input">
                         </div>
                         <div class="form-group">
-                            <label for="rainfall">Rainfall <span class="unit">mm</span></label>
+                            <label id="labelRainfall" for="rainfall">Rainfall <span class="unit">mm</span></label>
                             <input type="number" step="any" id="rainfall" name="rainfall" placeholder="e.g. 180.5" value="{{ form_data.rainfall }}" required class="form-input">
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary btn-block">
+                        <button type="submit" id="btnPredictCrop" class="btn btn-primary btn-block">
                             <span>🌾</span>
-                            <span>Predict Optimal Crop</span>
+                            <span id="btnPredictCropText">Predict Optimal Crop</span>
                         </button>
                     </div>
                 </form>
@@ -195,25 +209,25 @@
                     <div class="card-header">
                         <div class="card-header-icon">🎯</div>
                         <div>
-                            <h3>Prediction Result</h3>
-                            <p>Agronomic Advisory Outcome</p>
+                            <h3 id="resultCardTitle">Prediction Result</h3>
+                            <p id="resultCardSubtitle">Agronomic Advisory Outcome</p>
                         </div>
                     </div>
                     <div class="result-body">
                         {% if prediction %}
                             <div class="prediction-display">
                                 <span class="prediction-crop-icon">🌾</span>
-                                <div class="prediction-title">{{ prediction }}</div>
-                                <div class="prediction-badge">RECOMMENDED FOR CURRENT CONDITIONS</div>
-                                <p class="prediction-note">This crop is mathematically optimal for your soil N-P-K balance, pH range, and local temperature/rainfall profile.</p>
+                                <div class="prediction-title" id="predictionCropName">{{ prediction }}</div>
+                                <div id="predictionBadge" class="prediction-badge">RECOMMENDED FOR CURRENT CONDITIONS</div>
+                                <p id="predictionNote" class="prediction-note">This crop is mathematically optimal for your soil N-P-K balance, pH range, and local temperature/rainfall profile.</p>
                                 <button type="button" class="btn btn-secondary btn-sm" onclick="askCopilotAboutCrop('{{ prediction }}')">
-                                    <span>💬</span> Ask AI Copilot about {{ prediction }} practices
+                                    <span>💬</span> <span id="btnAskCopilotText">Ask AI Copilot about {{ prediction }} practices</span>
                                 </button>
                             </div>
                         {% else %}
                             <div class="result-placeholder">
                                 <span class="placeholder-icon">📋</span>
-                                <p>Fill in the soil and weather parameters and click <strong>Predict Optimal Crop</strong> to view recommendations.</p>
+                                <p id="resultPlaceholderText">Fill in the soil and weather parameters and click <strong>Predict Optimal Crop</strong> to view recommendations.</p>
                             </div>
                         {% endif %}
                     </div>
@@ -221,26 +235,26 @@
 
                 <!-- PROJECT PILLARS HIGHLIGHT -->
                 <div class="card pillars-card">
-                    <h3>Krishi Mitra Capabilities</h3>
+                    <h3 id="pillarsTitle">Krishi Mitra Capabilities</h3>
                     <div class="pillar-item" onclick="openCameraModal()">
                         <div class="pillar-icon">🍃</div>
                         <div>
-                            <strong>Pillar 1: Leaf Disease Vision</strong>
-                            <p>Real-time optical scanner with disease diagnosis & fungicide remedies.</p>
+                            <strong id="p1Title">Pillar 1: Leaf Disease Vision</strong>
+                            <p id="p1Desc">Real-time optical scanner with disease diagnosis & fungicide remedies.</p>
                         </div>
                     </div>
                     <div class="pillar-item" onclick="toggleCopilot(true)">
                         <div class="pillar-icon">💬</div>
                         <div>
-                            <strong>Pillar 3: Grounded AI Advisory</strong>
-                            <p>AI Extension Agent grounded on ICAR Package of Practices (PoP).</p>
+                            <strong id="p3Title">Pillar 3: Grounded AI Advisory</strong>
+                            <p id="p3Desc">AI Extension Agent grounded on ICAR Package of Practices (PoP).</p>
                         </div>
                     </div>
                     <div class="pillar-item">
                         <div class="pillar-icon">📊</div>
                         <div>
-                            <strong>Pillar 2: Regional Yield Models</strong>
-                            <p>Dimensionality-reduced agro-meteorological forecasting engine.</p>
+                            <strong id="p2Title">Pillar 2: Regional Yield Models</strong>
+                            <p id="p2Desc">Dimensionality-reduced agro-meteorological forecasting engine.</p>
                         </div>
                     </div>
                 </div>
@@ -259,7 +273,7 @@
                 <div class="modal-header-left">
                     <div class="brand-badge-sm">OPT</div>
                     <div>
-                        <h3>Field & Leaf Optical Diagnostic Scanner</h3>
+                        <h3 id="cameraModalTitle">Field & Leaf Optical Diagnostic Scanner</h3>
                         <p class="modal-sub">Unit: <strong>CAM-AGRI-01</strong> • Sensor: <strong>CMOS Optical & Chlorophyll IR</strong></p>
                     </div>
                 </div>
@@ -343,13 +357,22 @@
                         <span id="diseaseBadge" class="diagnosis-badge">CONFIDENCE: --%</span>
                     </div>
                 </div>
+
+                <!-- Vernacular Voice Readout Bar -->
+                <div class="diagnosis-voice-bar">
+                    <span id="voiceBarPrompt">🔊 Voice Readout / बोलकर सुनें:</span>
+                    <button type="button" id="btnDiseaseVoice" class="btn-speech" onclick="speakDiseaseDiagnosis()">
+                        <span>🔊</span> <span id="diseaseVoiceBtnText">Listen to Diagnosis</span>
+                    </button>
+                </div>
+
                 <div class="disease-result-grid">
                     <div>
-                        <strong>Visible Symptoms:</strong>
+                        <strong id="symptomsHeader">Visible Symptoms:</strong>
                         <p id="diseaseSymptoms">--</p>
                     </div>
                     <div>
-                        <strong>Actionable Remedy / Fungicide:</strong>
+                        <strong id="treatmentHeader">Actionable Remedy / Fungicide:</strong>
                         <p id="diseaseTreatment">--</p>
                     </div>
                 </div>
@@ -359,19 +382,19 @@
             <div class="modal-footer">
                 <div class="footer-left">
                     <button type="button" class="btn btn-outline btn-sm" onclick="toggleColorFilter()">
-                        🎨 Switch Filter: <span id="filterBtnText">Plant Stress IR</span>
+                        🎨 <span id="filterBtnText">Switch Filter: Plant Stress IR</span>
                     </button>
                     <label class="btn btn-outline btn-sm file-upload-btn">
-                        📁 Upload Leaf File
+                        <span id="fileUploadBtnText">📁 Upload Leaf File</span>
                         <input type="file" id="fileUploadInput" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
                     </label>
                 </div>
                 <div class="footer-right">
                     <button type="button" id="btnCapture" class="btn btn-camera" onclick="captureAndAnalyze()">
                         <span>📸</span>
-                        <span>Capture Leaf & Diagnose</span>
+                        <span id="btnCaptureText">Capture Leaf & Diagnose</span>
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="closeCameraModal()">Done</button>
+                    <button type="button" id="btnDoneCamera" class="btn btn-secondary" onclick="closeCameraModal()">Done</button>
                 </div>
             </div>
         </div>
@@ -388,8 +411,8 @@
             <div class="drawer-header-left">
                 <div class="brand-badge-sm">AI</div>
                 <div>
-                    <h3>Krishi Mitra Agri Copilot</h3>
-                    <p class="drawer-sub">Grounded on ICAR & State SAU Package-of-Practices (PoP)</p>
+                    <h3 id="copilotDrawerTitle">Krishi Mitra Agri Copilot</h3>
+                    <p id="copilotDrawerSub" class="drawer-sub">Grounded on ICAR & State SAU Package-of-Practices (PoP)</p>
                 </div>
             </div>
             <button type="button" class="drawer-close" onclick="toggleCopilot(false)">✕</button>
@@ -400,7 +423,7 @@
             <!-- Welcome Message -->
             <div class="chat-bubble copilot-bubble">
                 <div class="bubble-sender">Krishi Mitra AI Advisor</div>
-                <div class="bubble-text">
+                <div class="bubble-text" id="welcomeBubbleText">
                     Namaste! I am your AI Agricultural Extension Agent.
                     I am grounded in verified Package-of-Practices (PoP), soil nutrition science, and regional crop guidelines.
                     How can I assist your farm today?
@@ -414,17 +437,14 @@
         </div>
 
         <!-- Preset Queries Chips -->
-        <div class="preset-queries-bar">
-            <button type="button" class="preset-chip" onclick="sendPresetQuery('What crop should I grow with soil pH 6.5 and high rainfall?')">Optimal Crop for pH 6.5?</button>
-            <button type="button" class="preset-chip" onclick="sendPresetQuery('How to control rice blast disease effectively?')">Manage Rice Blast</button>
-            <button type="button" class="preset-chip" onclick="sendPresetQuery('What are the recommended N-P-K fertilizer doses for wheat?')">Wheat N-P-K Dosage</button>
-            <button type="button" class="preset-chip" onclick="sendPresetQuery('Organic pest control for tomato leaf spot and fruit borer')">Organic Tomato Pest Control</button>
-            <button type="button" class="preset-chip" onclick="sendPresetQuery('How does drip irrigation improve fertilizer use efficiency?')">Drip Irrigation Benefits</button>
+        <div class="preset-queries-bar" id="presetQueriesBar">
+            <!-- Populated dynamically via renderPresetChips() based on selected language -->
         </div>
 
-        <!-- Chat Input Form -->
+        <!-- Chat Input Form with Vernacular Speech-to-Text Mic -->
         <form class="drawer-input-form" onsubmit="handleSendQuery(event)">
-            <input type="text" id="chatInput" placeholder="Ask about crops, pests, fertilizer dosages..." class="drawer-input" autocomplete="off">
+            <input type="text" id="chatInput" placeholder="Ask about crops, pests, fertilizer dosages (or click 🎙️ to speak)..." class="drawer-input" autocomplete="off">
+            <button type="button" id="btnVoiceMic" class="btn-mic" onclick="toggleVoiceInput()" title="Speak in your language / अपनी भाषा में बोलें">🎙️</button>
             <button type="submit" id="btnSendChat" class="btn btn-copilot">Send</button>
         </form>
     </div>
@@ -432,7 +452,7 @@
     <!-- FLOATING ACTION BUTTON (Always accessible) -->
     <button type="button" class="floating-copilot-btn" onclick="toggleCopilot(true)">
         <span class="fab-icon">💬</span>
-        <span class="fab-text">Ask AI Copilot</span>
+        <span class="fab-text" id="fabText">Ask AI Copilot</span>
     </button>
 
     <!-- SCRIPT LOGIC -->
@@ -441,6 +461,210 @@
         let feedMode = 'webcam';
         let mediaStream = null;
         let activeCropContext = '{{ prediction }}';
+        let currentLang = localStorage.getItem('krishi_lang') || 'en';
+
+        // -------------------------------------------------------------
+        // 🌐 REGIONAL LANGUAGE SYSTEM & TRANSLATION ENGINE
+        // -------------------------------------------------------------
+        function changeLanguage(langCode) {
+            currentLang = (KRISHI_TRANSLATIONS && KRISHI_TRANSLATIONS[langCode]) ? langCode : 'en';
+            localStorage.setItem('krishi_lang', currentLang);
+
+            // Update dropdown if not synced
+            const selector = document.getElementById('langSelector');
+            if (selector && selector.value !== currentLang) {
+                selector.value = currentLang;
+            }
+
+            // Sync Voice Engine
+            if (window.krishiVoice) {
+                window.krishiVoice.setLanguage(currentLang);
+            }
+
+            const dict = KRISHI_TRANSLATIONS[currentLang];
+            if (!dict) return;
+
+            // 1. Navigation Elements
+            safeSetText('brandTitleText', dict.nav.title);
+            safeSetText('brandTag', dict.nav.badge);
+            safeSetText('brandSubtitle', dict.nav.subtitle);
+            safeSetText('navBtnCameraText', dict.nav.btnCamera);
+            safeSetText('navBtnLiveText', dict.nav.btnLive);
+            safeSetText('navBtnCopilotText', dict.nav.btnCopilot);
+
+            // 2. Weather & Agro-Climate
+            const weatherTitleEl = document.getElementById('weatherBarTitle');
+            if (weatherTitleEl) {
+                weatherTitleEl.innerHTML = `${dict.weather.title} <span id="weatherBarTag" class="tag-open-meteo">${dict.weather.tag}</span>`;
+            }
+            safeSetText('weatherBarSubtitle', dict.weather.subtitle);
+            const cityInput = document.getElementById('cityInput');
+            if (cityInput) cityInput.placeholder = dict.weather.placeholder;
+            safeSetText('btnFetchWeather', dict.weather.btnFetch);
+            safeSetText('btnDetectGPS', dict.weather.btnGPS);
+            safeSetText('quickCitiesLabel', dict.weather.quickSelect);
+            safeSetText('statLabelHumidity', dict.weather.humidity);
+            safeSetText('statLabelRainfall', dict.weather.rainfall);
+            safeSetText('statLabelWind', dict.weather.wind);
+            safeSetText('forecastTitleText', dict.weather.forecastTitle);
+            safeSetText('btnAutoFillClimate', dict.weather.btnAutoFill);
+
+            // 3. Crop Recommendation Form
+            safeSetText('cropFormTitle', dict.cropForm.title);
+            safeSetText('cropFormSubtitle', dict.cropForm.subtitle);
+            safeSetText('soilSectionTitle', dict.cropForm.soilSection);
+            safeSetHtml('labelN', `${dict.cropForm.nitrogen} <span class="unit">kg/ha</span>`);
+            safeSetHtml('labelP', `${dict.cropForm.phosphorus} <span class="unit">kg/ha</span>`);
+            safeSetHtml('labelK', `${dict.cropForm.potassium} <span class="unit">kg/ha</span>`);
+            safeSetHtml('labelPh', `${dict.cropForm.ph} <span class="unit">(0 - 14)</span>`);
+
+            safeSetText('climateSectionTitle', dict.cropForm.climateSection);
+            safeSetHtml('labelTemp', `${dict.cropForm.temperature} <span class="unit">°C</span>`);
+            safeSetHtml('labelHumidity', `${dict.cropForm.humidity} <span class="unit">%</span>`);
+            safeSetHtml('labelRainfall', `${dict.cropForm.rainfall} <span class="unit">mm</span>`);
+            safeSetText('btnPredictCropText', dict.cropForm.btnPredict);
+
+            // 4. Recommendation Result Card & Pillars
+            safeSetText('resultCardTitle', dict.resultCard.title);
+            safeSetText('resultCardSubtitle', dict.resultCard.subtitle);
+            safeSetText('predictionBadge', dict.resultCard.badge);
+            safeSetText('predictionNote', dict.resultCard.note);
+            safeSetHtml('resultPlaceholderText', dict.resultCard.placeholder);
+
+            if (activeCropContext && dict.crops && dict.crops[activeCropContext]) {
+                const localizedCrop = dict.crops[activeCropContext];
+                safeSetText('predictionCropName', `${activeCropContext} (${localizedCrop})`);
+                safeSetText('btnAskCopilotText', `💬 ${dict.resultCard.btnAskCopilot} (${localizedCrop})`);
+            } else if (activeCropContext) {
+                safeSetText('btnAskCopilotText', `💬 ${dict.resultCard.btnAskCopilot} (${activeCropContext})`);
+            }
+
+            safeSetText('pillarsTitle', dict.pillars.title);
+            safeSetText('p1Title', dict.pillars.p1Title);
+            safeSetText('p1Desc', dict.pillars.p1Desc);
+            safeSetText('p3Title', dict.pillars.p3Title);
+            safeSetText('p3Desc', dict.pillars.p3Desc);
+            safeSetText('p2Title', dict.pillars.p2Title);
+            safeSetText('p2Desc', dict.pillars.p2Desc);
+
+            // 5. Camera Scanner Modal
+            safeSetText('cameraModalTitle', dict.camera.title);
+            safeSetText('btnModeWebcam', dict.camera.tabWebcam);
+            safeSetText('btnModeSim', dict.camera.tabSim);
+            safeSetText('filterBtnText', dict.camera.btnFilter);
+            safeSetText('fileUploadBtnText', dict.camera.btnUpload);
+            safeSetText('btnCaptureText', dict.camera.btnCapture);
+            safeSetText('btnDoneCamera', dict.camera.btnDone);
+            safeSetText('symptomsHeader', dict.camera.symptomsTitle);
+            safeSetText('treatmentHeader', dict.camera.treatmentTitle);
+            safeSetText('diseaseVoiceBtnText', dict.camera.btnListen);
+
+            // 6. Copilot Drawer
+            safeSetText('copilotDrawerTitle', dict.copilot.title);
+            safeSetText('copilotDrawerSub', dict.copilot.subtitle);
+            safeSetText('welcomeBubbleText', dict.copilot.welcome);
+            const chatIn = document.getElementById('chatInput');
+            if (chatIn) chatIn.placeholder = dict.copilot.placeholder;
+            safeSetText('btnSendChat', dict.copilot.btnSend);
+            safeSetText('fabText', dict.nav.btnCopilot);
+
+            renderPresetChips(currentLang);
+        }
+
+        function renderPresetChips(langCode) {
+            const bar = document.getElementById('presetQueriesBar');
+            if (!bar) return;
+            bar.innerHTML = '';
+            const dict = KRISHI_TRANSLATIONS[langCode] || KRISHI_TRANSLATIONS.en;
+            if (dict.copilot && dict.copilot.presets) {
+                dict.copilot.presets.forEach(queryText => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'preset-chip';
+                    btn.innerText = queryText;
+                    btn.onclick = () => sendPresetQuery(queryText);
+                    bar.appendChild(btn);
+                });
+            }
+        }
+
+        function safeSetText(id, text) {
+            const el = document.getElementById(id);
+            if (el && text !== undefined) el.innerText = text;
+        }
+
+        function safeSetHtml(id, html) {
+            const el = document.getElementById(id);
+            if (el && html !== undefined) el.innerHTML = html;
+        }
+
+        // -------------------------------------------------------------
+        // 🎙️ VOICE SPEECH-TO-TEXT & TEXT-TO-SPEECH CONTROLS
+        // -------------------------------------------------------------
+        function toggleVoiceInput() {
+            if (window.krishiVoice) {
+                window.krishiVoice.toggleListening();
+            }
+        }
+
+        let isSpeakingDiagnosis = false;
+        function speakDiseaseDiagnosis() {
+            if (!window.krishiVoice) return;
+            const btn = document.getElementById('btnDiseaseVoice');
+            const btnText = document.getElementById('diseaseVoiceBtnText');
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
+
+            if (isSpeakingDiagnosis || window.krishiVoice.isSpeaking()) {
+                window.krishiVoice.stopSpeaking();
+                isSpeakingDiagnosis = false;
+                if (btn) btn.classList.remove('speaking');
+                if (btnText) btnText.innerText = dict.camera.btnListen;
+                return;
+            }
+
+            const title = document.getElementById('diseaseTitle').innerText;
+            const symptoms = document.getElementById('diseaseSymptoms').innerText;
+            const treatment = document.getElementById('diseaseTreatment').innerText;
+            const fullText = `${title}. ${dict.camera.symptomsTitle} ${symptoms}. ${dict.camera.treatmentTitle} ${treatment}`;
+
+            isSpeakingDiagnosis = true;
+            if (btn) btn.classList.add('speaking');
+            if (btnText) btnText.innerText = dict.camera.btnStopVoice;
+
+            window.krishiVoice.speakText(fullText, () => {
+                isSpeakingDiagnosis = false;
+                if (btn) btn.classList.remove('speaking');
+                if (btnText) btnText.innerText = dict.camera.btnListen;
+            });
+        }
+
+        function speakMessage(text, btnElement) {
+            if (!window.krishiVoice) return;
+            if (btnElement && btnElement.classList.contains('speaking')) {
+                window.krishiVoice.stopSpeaking();
+                btnElement.classList.remove('speaking');
+                btnElement.innerHTML = '<span>🔊</span> Listen';
+                return;
+            }
+
+            // Reset any other speaking buttons
+            document.querySelectorAll('.btn-speech.speaking').forEach(b => {
+                b.classList.remove('speaking');
+                b.innerHTML = '<span>🔊</span> Listen';
+            });
+
+            if (btnElement) {
+                btnElement.classList.add('speaking');
+                btnElement.innerHTML = '<span>⏹</span> Stop';
+            }
+
+            window.krishiVoice.speakText(text, () => {
+                if (btnElement) {
+                    btnElement.classList.remove('speaking');
+                    btnElement.innerHTML = '<span>🔊</span> Listen';
+                }
+            });
+        }
 
         // -------------------------------------------------------------
         // WEATHER & AGRO-CLIMATE INTELLIGENCE (Open-Meteo)
@@ -571,11 +795,6 @@
             el.innerText = msg;
         }
 
-        // Auto-fetch on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchWeatherByCity();
-        });
-
         // -------------------------------------------------------------
         // CAMERA MODAL (Adapted from Caterpillar InCabCameraFeed)
         // -------------------------------------------------------------
@@ -589,6 +808,7 @@
         function closeCameraModal() {
             document.getElementById('cameraModal').style.display = 'none';
             stopWebcam();
+            if (window.krishiVoice) window.krishiVoice.stopSpeaking();
         }
 
         function switchFeedMode(mode) {
@@ -656,7 +876,8 @@
 
         async function captureAndAnalyze() {
             const hudStatus = document.getElementById('hudStatus');
-            hudStatus.innerText = 'SCANNING & DIAGNOSING...';
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
+            hudStatus.innerText = dict.camera.scanning || 'SCANNING & DIAGNOSING...';
             document.getElementById('btnCapture').disabled = true;
 
             let b64 = '';
@@ -682,14 +903,14 @@
                 const res = await fetch('/api/scan_leaf', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image: b64 })
+                    body: JSON.stringify({ image: b64, lang: currentLang })
                 });
                 const data = await res.json();
                 renderDiagnosis(data);
             } catch (err) {
                 alert('Analysis error: ' + err);
             } finally {
-                hudStatus.innerText = 'READY TO SCAN';
+                hudStatus.innerText = dict.camera.ready || 'READY TO SCAN';
                 document.getElementById('btnCapture').disabled = false;
             }
         }
@@ -698,19 +919,22 @@
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
             reader.onload = async function(evt) {
                 const b64 = evt.target.result;
-                document.getElementById('hudStatus').innerText = 'ANALYZING UPLOADED IMAGE...';
+                document.getElementById('hudStatus').innerText = dict.camera.analyzingUpload || 'ANALYZING UPLOADED IMAGE...';
                 try {
                     const res = await fetch('/api/scan_leaf', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ image: b64 })
+                        body: JSON.stringify({ image: b64, lang: currentLang })
                     });
                     const data = await res.json();
                     renderDiagnosis(data);
                 } catch (err) {
                     alert('Upload analysis failed: ' + err);
+                } finally {
+                    document.getElementById('hudStatus').innerText = dict.camera.ready || 'READY TO SCAN';
                 }
             };
             reader.readAsDataURL(file);
@@ -740,6 +964,7 @@
             } else {
                 drawer.classList.remove('open');
                 backdrop.style.display = 'none';
+                if (window.krishiVoice) window.krishiVoice.stopSpeaking();
             }
         }
 
@@ -750,7 +975,17 @@
 
         function askCopilotAboutCrop(crop) {
             toggleCopilot(true);
-            sendPresetQuery(`What are the ideal package of practices, fertilizer doses, and irrigation schedule for ${crop}?`);
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
+            const localizedCrop = (dict.crops && dict.crops[crop]) ? dict.crops[crop] : crop;
+            const queries = {
+                en: `What are the ideal package of practices, fertilizer doses, and irrigation schedule for ${crop}?`,
+                hi: `${localizedCrop} की खेती के लिए अनुशंसित पैकेज ऑफ प्रैक्टिस, खाद की मात्रा और सिंचाई प्रबंधन क्या है?`,
+                bn: `${localizedCrop} চাষের জন্য অনুমোদিত সার প্রয়োগ ও সেচ ব্যবস্থাপনার সঠিক নিয়ম কী?`,
+                te: `${localizedCrop} సాగుకు అనువైన ఎరువుల మోతాదు మరియు నీటి యాజమాన్య పద్ధతులు ఏమిటి?`,
+                mr: `${localizedCrop} पिकासाठी शिफारशीत खत व्यवस्थापन आणि पाणी नियोजन काय आहे?`,
+                ta: `${localizedCrop} சாகுபடிக்கான சிறந்த உர அளவு மற்றும் பாசன மேலாண்மை என்ன?`
+            };
+            sendPresetQuery(queries[currentLang] || queries.en);
         }
 
         async function handleSendQuery(e) {
@@ -762,6 +997,9 @@
             appendMessage('user', query);
             input.value = '';
 
+            // Stop speech if listening
+            if (window.krishiVoice) window.krishiVoice.stopListening();
+
             // Add loading placeholder
             const loadId = appendLoadingMessage();
 
@@ -769,7 +1007,7 @@
                 const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: query, crop_context: activeCropContext })
+                    body: JSON.stringify({ query: query, crop_context: activeCropContext, lang: currentLang })
                 });
                 const data = await res.json();
                 removeLoadingMessage(loadId);
@@ -785,7 +1023,10 @@
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${sender}-bubble`;
 
-            let html = `<div class="bubble-sender">${sender === 'user' ? 'Farmer' : 'Krishi Mitra AI Advisor'}</div>`;
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
+            const senderLabel = sender === 'user' ? 'Farmer' : (dict.nav.title + ' AI Advisor');
+
+            let html = `<div class="bubble-sender">${senderLabel}</div>`;
             html += `<div class="bubble-text">${escapeHtml(text)}</div>`;
 
             if (tags && tags.length > 0) {
@@ -795,8 +1036,20 @@
             if (action) {
                 html += `
                     <div class="action-callout">
-                        <span class="action-callout-title">🌿 Actionable Agricultural Recommendation:</span>
+                        <span class="action-callout-title">${dict.copilot.actionTitle || '🌿 Actionable Agricultural Recommendation:'}</span>
                         <div class="action-callout-body">${escapeHtml(action)}</div>
+                    </div>
+                `;
+            }
+
+            // Add audio readout speaker button for copilot messages
+            if (sender === 'copilot') {
+                const speechContent = (text + (action ? '. ' + action : '')).replace(/"/g, '&quot;');
+                html += `
+                    <div class="chat-bubble-actions">
+                        <button type="button" class="btn-speech" onclick="speakMessage(decodeURIComponent('${encodeURIComponent(text + (action ? '. ' + action : ''))}'), this)">
+                            <span>🔊</span> Listen
+                        </button>
                     </div>
                 `;
             }
@@ -828,6 +1081,14 @@
             div.innerText = text;
             return div.innerHTML;
         }
+
+        // -------------------------------------------------------------
+        // INITIALIZATION ON DOM LOAD
+        // -------------------------------------------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchWeatherByCity();
+            changeLanguage(currentLang);
+        });
     </script>
 </body>
 </html>

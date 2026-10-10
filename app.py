@@ -67,11 +67,12 @@ def api_chat():
     data = request.get_json(silent=True) or {}
     query = data.get('query', '')
     crop_context = data.get('crop_context', None)
+    lang = data.get('lang', 'en')
 
     if not query:
         return jsonify({"error": "Empty query"}), 400
 
-    result = copilot_service.answer_query(query=query, crop_context=crop_context)
+    result = copilot_service.answer_query(query=query, crop_context=crop_context, lang=lang)
     return jsonify(result)
 
 
@@ -82,11 +83,12 @@ def api_chat():
 def api_scan_leaf():
     data = request.get_json(silent=True) or {}
     image_b64 = data.get('image', '')
+    lang = data.get('lang', 'en')
 
     if not image_b64:
         return jsonify({"status": "error", "message": "No image provided"}), 400
 
-    result = disease_service.analyze_image_base64(image_b64)
+    result = disease_service.analyze_image_base64(image_b64, lang=lang)
     return jsonify(result)
 
 

@@ -55,20 +55,29 @@ def main():
     else:
         print("⚠️ Active Engine : Gemini Vision Fallback (Local model weights not found)")
 
-    # Choose image to test
-    if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
-        test_img_path = sys.argv[1]
-        print(f"📷 Testing Image: {test_img_path}")
-    else:
+    lang = "en"
+    test_img_path = None
+
+    for arg in sys.argv[1:]:
+        if arg in ["hi", "bn", "te", "mr", "ta", "en"]:
+            lang = arg
+        elif os.path.exists(arg):
+            test_img_path = arg
+
+    if not test_img_path:
         test_img_path = create_sample_leaf()
         print(f"📷 Testing Image: Created specimen at {test_img_path}")
+    else:
+        print(f"📷 Testing Image: {test_img_path}")
+
+    print(f"🌐 Diagnosis Language: {lang.upper()}")
 
     # Convert image to base64
     with open(test_img_path, "rb") as f:
         b64_str = base64.b64encode(f.read()).decode("utf-8")
 
     # Run inference through disease service
-    result = disease_service.analyze_image_base64(b64_str)
+    result = disease_service.analyze_image_base64(b64_str, lang=lang)
 
     print("\n" + "-" * 65)
     print(" 🎯 DIAGNOSTIC RESULTS")
