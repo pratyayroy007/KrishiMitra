@@ -1,0 +1,162 @@
+{
+  "Apple___Apple_scab": {
+    "crop": "Apple",
+    "condition": "Fungal Disease",
+    "diagnosis": "Apple Scab (Venturia inaequalis)",
+    "symptoms": "Olive-green to black velvety spots on leaves; fruit develops brown corky scabs.",
+    "treatment": "Spray Mancozeb 75% WP @ 2.5 g/L or Difenoconazole 25% EC @ 0.5 mL/L.",
+    "prevention": "Prune infected canopy twigs and clear fallen leaf litter beneath trees."
+  },
+  "Apple___Black_rot": {
+    "crop": "Apple",
+    "condition": "Fungal Disease",
+    "diagnosis": "Black Rot (Botryosphaeria obtusa)",
+    "symptoms": "Frog-eye leaf spots with purple margins; firm rot on fruit expanding in concentric rings.",
+    "treatment": "Apply Captan 50% WP @ 2.5 g/L or Thiophanate-methyl 70% WP @ 1 g/L.",
+    "prevention": "Remove dead wood, mummified fruits, and fire blight cankers during dormant pruning."
+  },
+  "Apple___healthy": {
+    "crop": "Apple",
+    "condition": "Healthy",
+    "diagnosis": "Healthy Apple Foliage",
+    "symptoms": "Vigorous green leaves without chlorotic lesions or necrosis.",
+    "treatment": "No fungicide required. Maintain standard micronutrient foliar spray (Zinc, Boron).",
+    "prevention": "Follow standard balanced N-P-K orchard nutrition."
+  },
+  "Corn_(maize)___Common_rust_": {
+    "crop": "Corn (Maize)",
+    "condition": "Fungal Disease",
+    "diagnosis": "Common Rust (Puccinia sorghi)",
+    "symptoms": "Golden-brown to cinnamon-brown powdery pustules on both upper and lower leaf surfaces.",
+    "treatment": "Spray Azoxystrobin 18.2% + Difenoconazole 11.4% SC @ 1 mL/L.",
+    "prevention": "Plant certified rust-resistant maize hybrids; avoid excessive high-density planting."
+  },
+  "Corn_(maize)___Northern_Leaf_Blight": {
+    "crop": "Corn (Maize)",
+    "condition": "Fungal Disease",
+    "diagnosis": "Northern Corn Leaf Blight (Exserohilum turcicum)",
+    "symptoms": "Long elliptical, cigar-shaped grayish-green to tan lesions parallel to leaf veins.",
+    "treatment": "Apply Propiconazole 25% EC @ 1 mL/L or Mancozeb 75% WP @ 2.5 g/L.",
+    "prevention": "Deep summer ploughing to bury crop residue; 2-year crop rotation with non-host crops."
+  },
+  "Corn_(maize)___healthy": {
+    "crop": "Corn (Maize)",
+    "condition": "Healthy",
+    "diagnosis": "Healthy Maize Foliage",
+    "symptoms": "Dark green, robust leaves with intact parallel venation.",
+    "treatment": "No chemical intervention needed. Ensure split Nitrogen application at knee-high stage.",
+    "prevention": "Maintain timely weed control and optimum field drainage."
+  },
+  "Grape___Black_rot": {
+    "crop": "Grape",
+    "condition": "Fungal Disease",
+    "diagnosis": "Grape Black Rot (Guignardia bidwellii)",
+    "symptoms": "Reddish-brown circular leaf spots with tiny black pycnidia; shriveled black mummified berries.",
+    "treatment": "Spray Myclobutanil 10% WP @ 1 g/L or Mancozeb @ 2 g/L before bloom and fruit set.",
+    "prevention": "Maintain vine canopy training (Bower/Y-trellis) for maximum sunlight and aeration."
+  },
+  "Grape___Esca_(Black_Measles)": {
+    "crop": "Grape",
+    "condition": "Fungal Complex",
+    "diagnosis": "Esca / Black Measles",
+    "symptoms": "Tiger-stripe interveinal chlorosis and necrosis on leaves; dark spotting on berry skin.",
+    "treatment": "Protect pruning wounds with Copper Oxychloride 50% WP paste; no single systemic cure.",
+    "prevention": "Disinfect pruning shears between vines; remove and burn severely declining vines."
+  },
+  "Grape___healthy": {
+    "crop": "Grape",
+    "condition": "Healthy",
+    "diagnosis": "Healthy Grape Vine Foliage",
+    "symptoms": "Vibrant lobed leaves without spotting or margin burn.",
+    "treatment": "No fungicide needed. Apply prophylactic organic Trichoderma viride drench.",
+    "prevention": "Standard shoot thinning and balanced potassium fertigation."
+  },
+  "Potato___Early_blight": {
+    "crop": "Potato",
+    "condition": "Fungal Disease",
+    "diagnosis": "Early Blight (Alternaria solani)",
+    "symptoms": "Concentric target-board ring lesions on older leaves, surrounded by yellow chlorotic halo.",
+    "treatment": "Spray Chlorothalonil 75% WP @ 2 g/L or Azoxystrobin 23% SC @ 1 mL/L.",
+    "prevention": "Avoid overhead sprinkler irrigation; practice 3-year solanaceous crop rotation."
+  },
+  "Potato___Late_blight": {
+    "crop": "Potato",
+    "condition": "Oomycete / Water Mold",
+    "diagnosis": "Potato Late Blight (Phytophthora infestans)",
+    "symptoms": "Water-soaked dark lesions rapidly expanding in cool humid weather with white mildew under leaf.",
+    "treatment": "Immediately spray Metalaxyl-M + Mancozeb @ 2.5 g/L or Dimethomorph 50% WP @ 1 g/L.",
+    "prevention": "Plant certified disease-free seed tubers; ensure proper earthing-up to shield tubers."
+  },
+  "Potato___healthy": {
+    "crop": "Potato",
+    "condition": "Healthy",
+    "diagnosis": "Healthy Potato Crop",
+    "symptoms": "Full green compound leaves with upright stem vigor.",
+    "treatment": "No fungicide application needed. Maintain earthing up and soil moisture.",
+    "prevention": "Scout field weekly during high humidity weather."
+  },
+  "Tomato___Bacterial_spot": {
+    "crop": "Tomato",
+    "condition": "Bacterial Disease",
+    "diagnosis": "Tomato Bacterial Spot (Xanthomonas spp.)",
+    "symptoms": "Small angular dark water-soaked leaf spots; margins turn yellow with necrotic tears.",
+    "treatment": "Spray Copper Hydroxide 53.8% DF @ 2 g/L mixed with Streptocycline @ 0.1 g/L.",
+    "prevention": "Use hot-water treated certified seeds; avoid handling plants while foliage is wet."
+  },
+  "Tomato___Early_blight": {
+    "crop": "Tomato",
+    "condition": "Fungal Disease",
+    "diagnosis": "Tomato Early Blight (Alternaria solani)",
+    "symptoms": "Target-board concentric ring spots on lower foliage; premature defoliation.",
+    "treatment": "Spray Mancozeb 75% WP @ 2.5 g/L or Tebuconazole 25.9% EC @ 1 mL/L.",
+    "prevention": "Mulch around base to prevent soil splash; stake tomato vines off the ground."
+  },
+  "Tomato___Late_blight": {
+    "crop": "Tomato",
+    "condition": "Oomycete Disease",
+    "diagnosis": "Tomato Late Blight (Phytophthora infestans)",
+    "symptoms": "Large irregular dark greasy water-soaked lesions on leaves and stems with white fungal mold.",
+    "treatment": "Spray Cymoxanil 8% + Mancozeb 64% WP @ 2 g/L or Fosetyl-Al 80% WP @ 2.5 g/L.",
+    "prevention": "Ensure wide spacing (60x45 cm) for canopy aeration; destroy infected plants immediately."
+  },
+  "Tomato___Leaf_Mold": {
+    "crop": "Tomato",
+    "condition": "Fungal Disease",
+    "diagnosis": "Tomato Leaf Mold (Passalora fulva)",
+    "symptoms": "Pale green or yellowish spots on upper leaf surface with olive-green velvety mold underneath.",
+    "treatment": "Spray Copper Oxychloride 50% WP @ 2.5 g/L or Difenoconazole @ 0.5 mL/L.",
+    "prevention": "Reduce humidity below 85% in polyhouses/fields; prune lower suckers for ventilation."
+  },
+  "Tomato___Septoria_leaf_spot": {
+    "crop": "Tomato",
+    "condition": "Fungal Disease",
+    "diagnosis": "Septoria Leaf Spot (Septoria lycopersici)",
+    "symptoms": "Numerous circular small spots (1-3mm) with gray centers and dark brown margins.",
+    "treatment": "Spray Chlorothalonil 75% WP @ 2 g/L or Mancozeb @ 2.5 g/L at first symptom appearance.",
+    "prevention": "Rotate crops; remove volunteer nightshade family weeds around field borders."
+  },
+  "Tomato___Target_Spot": {
+    "crop": "Tomato",
+    "condition": "Fungal Disease",
+    "diagnosis": "Tomato Target Spot (Corynespora cassiicola)",
+    "symptoms": "Brown lesions with pinpoint centers and concentric zones on leaves and stems.",
+    "treatment": "Apply Azoxystrobin 23% SC @ 1 mL/L or Pyraclostrobin 20% WG @ 1 g/L.",
+    "prevention": "Ensure balanced nitrogen fertilization; avoid water stress during fruiting."
+  },
+  "Tomato___Yellow_Leaf_Curl_Virus": {
+    "crop": "Tomato",
+    "condition": "Viral Disease (Whitefly-borne)",
+    "diagnosis": "Tomato Yellow Leaf Curl Virus (TYLCV)",
+    "symptoms": "Severe upward curling and cupping of leaflets, marginal chlorosis, stunted bushy plant growth.",
+    "treatment": "Virus cannot be cured; control whitefly vector: Spray Diafenthiuron 50% WP @ 1.2 g/L or Neem Oil @ 3 mL/L.",
+    "prevention": "Install Yellow Sticky Traps @ 15 traps/acre; rogue out early infected symptomatic plants."
+  },
+  "Tomato___healthy": {
+    "crop": "Tomato",
+    "condition": "Healthy",
+    "diagnosis": "Healthy Tomato Plant",
+    "symptoms": "Vibrant green serrated foliage without spotting, curling, or mildew.",
+    "treatment": "No pesticide required. Apply bio-fertilizer (Pseudomonas fluorescens) as soil drench.",
+    "prevention": "Maintain consistent drip irrigation and calcium feeding to prevent blossom end rot."
+  }
+}
