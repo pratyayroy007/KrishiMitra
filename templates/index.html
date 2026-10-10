@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.1">
-    <script src="{{ url_for('static', filename='js/translations.js') }}?v=2.1"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.2">
+    <script src="{{ url_for('static', filename='js/translations.js') }}?v=2.2"></script>
 </head>
 <body>
 
@@ -36,6 +36,12 @@
                     </select>
                     <span class="lang-select-arrow">▼</span>
                 </div>
+
+                <!-- Global Audio Assistance Guide -->
+                <button type="button" id="btnAudioGuide" class="btn btn-audio-guide" onclick="playAudioGuide()" title="Listen to Voice Guide / ध्वनि सहायक सुनें">
+                    <span id="audioGuideIcon">🔊</span>
+                    <span id="audioGuideText">Voice Guide</span>
+                </button>
 
                 <button type="button" class="btn btn-camera" onclick="openCameraModal()">
                     <span class="icon">📷</span>
@@ -135,6 +141,9 @@
                     <button type="button" id="btnAutoFillClimate" class="btn btn-primary btn-sm" onclick="applyWeatherToForm()">
                         ⚡ Auto-Fill This Climate into Crop Form
                     </button>
+                    <button type="button" id="btnListenWeather" class="btn btn-secondary btn-sm" onclick="speakWeatherAdvisory()" title="Listen to Live Agro-Climate Advisory">
+                        <span id="listenWeatherIcon">🔊</span> <span id="listenWeatherText">Listen to Advisory</span>
+                    </button>
                     <span id="applyToast" class="apply-toast" style="display: none;">✓ Parameters injected into form!</span>
                 </div>
             </div>
@@ -220,9 +229,14 @@
                                 <div class="prediction-title" id="predictionCropName">{{ prediction }}</div>
                                 <div id="predictionBadge" class="prediction-badge">RECOMMENDED FOR CURRENT CONDITIONS</div>
                                 <p id="predictionNote" class="prediction-note">This crop is mathematically optimal for your soil N-P-K balance, pH range, and local temperature/rainfall profile.</p>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="askCopilotAboutCrop('{{ prediction }}')">
-                                    <span>💬</span> <span id="btnAskCopilotText">Ask AI Copilot about {{ prediction }} practices</span>
-                                </button>
+                                <div class="prediction-actions">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="askCopilotAboutCrop('{{ prediction }}')">
+                                        <span>💬</span> <span id="btnAskCopilotText">Ask AI Copilot about {{ prediction }} practices</span>
+                                    </button>
+                                    <button type="button" id="btnListenPrediction" class="btn btn-outline btn-sm" onclick="speakPredictionAdvisory()" title="Listen to Crop Recommendation Advisory">
+                                        <span id="listenPredIcon">🔊</span> <span id="listenPredText">Listen to Advisory</span>
+                                    </button>
+                                </div>
                             </div>
                         {% else %}
                             <div class="result-placeholder">
@@ -415,7 +429,12 @@
                     <p id="copilotDrawerSub" class="drawer-sub">Grounded on ICAR & State SAU Package-of-Practices (PoP)</p>
                 </div>
             </div>
-            <button type="button" class="drawer-close" onclick="toggleCopilot(false)">✕</button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button type="button" id="btnAutoVoiceToggle" class="btn-voice-toggle" onclick="toggleAutoVoice()" title="Toggle Auto Voice Readout for AI Responses">
+                    🔇 Voice: OFF
+                </button>
+                <button type="button" class="drawer-close" onclick="toggleCopilot(false)">✕</button>
+            </div>
         </div>
 
         <!-- Messages Container -->
@@ -432,6 +451,11 @@
                     <span class="tag-chip">#KrishiMitra</span>
                     <span class="tag-chip">#CropAdvisory</span>
                     <span class="tag-chip">#SoilHealth</span>
+                </div>
+                <div class="chat-bubble-actions">
+                    <button type="button" class="btn-speech" onclick="speakMessage(document.getElementById('welcomeBubbleText').innerText, this)">
+                        <span>🔊</span> <span class="speech-btn-label">Listen</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -491,6 +515,21 @@
             safeSetText('navBtnCameraText', dict.nav.btnCamera);
             safeSetText('navBtnLiveText', dict.nav.btnLive);
             safeSetText('navBtnCopilotText', dict.nav.btnCopilot);
+
+            // 1b. Audio Assistance UI
+            if (dict.audio) {
+                safeSetText('audioGuideText', dict.audio.guideBtn.replace('🔊 ', ''));
+                safeSetText('listenWeatherText', dict.audio.weatherBtn.replace('🔊 ', ''));
+                safeSetText('listenPredText', dict.audio.predBtn.replace('🔊 ', ''));
+                const autoVoiceBtn = document.getElementById('btnAutoVoiceToggle');
+                if (autoVoiceBtn) {
+                    autoVoiceBtn.innerText = autoVoiceEnabled ? dict.audio.autoVoiceOn : dict.audio.autoVoiceOff;
+                }
+                const listenLabel = dict.audio.listen.replace('🔊 ', '');
+                document.querySelectorAll('.speech-btn-label').forEach(el => {
+                    el.innerText = listenLabel;
+                });
+            }
 
             // 2. Weather & Agro-Climate
             const weatherTitleEl = document.getElementById('weatherBarTitle');
@@ -599,12 +638,166 @@
         }
 
         // -------------------------------------------------------------
-        // 🎙️ VOICE SPEECH-TO-TEXT & TEXT-TO-SPEECH CONTROLS
+        // 🎙️ VOICE SPEECH-TO-TEXT & MULTI-LANGUAGE AUDIO ASSISTANCE
         // -------------------------------------------------------------
+        let autoVoiceEnabled = false;
+        function toggleAutoVoice() {
+            autoVoiceEnabled = !autoVoiceEnabled;
+            const btn = document.getElementById('btnAutoVoiceToggle');
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
+            if (!btn) return;
+            if (autoVoiceEnabled) {
+                btn.classList.add('voice-active');
+                btn.innerText = dict.audio ? dict.audio.autoVoiceOn : '🔊 Voice: ON';
+            } else {
+                btn.classList.remove('voice-active');
+                btn.innerText = dict.audio ? dict.audio.autoVoiceOff : '🔇 Voice: OFF';
+                if (window.krishiVoice) window.krishiVoice.stopSpeaking();
+            }
+        }
+
         function toggleVoiceInput() {
             if (window.krishiVoice) {
                 window.krishiVoice.toggleListening();
             }
+        }
+
+        let isSpeakingGuide = false;
+        function playAudioGuide() {
+            if (!window.krishiVoice) return;
+            const btn = document.getElementById('btnAudioGuide');
+            const icon = document.getElementById('audioGuideIcon');
+            const textEl = document.getElementById('audioGuideText');
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
+
+            if (isSpeakingGuide || window.krishiVoice.isSpeaking()) {
+                window.krishiVoice.stopSpeaking();
+                isSpeakingGuide = false;
+                if (btn) btn.classList.remove('speaking');
+                if (icon) icon.innerText = '🔊';
+                if (textEl) textEl.innerText = dict.audio ? dict.audio.guideBtn.replace('🔊 ', '') : 'Voice Guide';
+                return;
+            }
+
+            const guideText = (dict.audio && dict.audio.guideSpeech) ? dict.audio.guideSpeech : KRISHI_TRANSLATIONS.en.audio.guideSpeech;
+
+            isSpeakingGuide = true;
+            if (btn) btn.classList.add('speaking');
+            if (icon) icon.innerText = '⏹';
+            if (textEl) textEl.innerText = dict.audio ? dict.audio.stop.replace('⏹ ', '') : 'Stop';
+
+            window.krishiVoice.speakText(guideText, () => {
+                isSpeakingGuide = false;
+                if (btn) btn.classList.remove('speaking');
+                if (icon) icon.innerText = '🔊';
+                if (textEl) textEl.innerText = dict.audio ? dict.audio.guideBtn.replace('🔊 ', '') : 'Voice Guide';
+            });
+        }
+
+        let isSpeakingWeather = false;
+        function speakWeatherAdvisory() {
+            if (!window.krishiVoice) return;
+            const btn = document.getElementById('btnListenWeather');
+            const icon = document.getElementById('listenWeatherIcon');
+            const textEl = document.getElementById('listenWeatherText');
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
+
+            if (isSpeakingWeather || window.krishiVoice.isSpeaking()) {
+                window.krishiVoice.stopSpeaking();
+                isSpeakingWeather = false;
+                if (btn) btn.classList.remove('speaking');
+                if (icon) icon.innerText = '🔊';
+                if (textEl) textEl.innerText = dict.audio ? dict.audio.weatherBtn.replace('🔊 ', '') : 'Listen to Advisory';
+                return;
+            }
+
+            const data = currentWeatherData || {
+                city: 'Pune',
+                temperature: 28,
+                humidity: 50,
+                advisory: { spraying_status: 'Favorable', spraying_msg: 'Ideal weather for spraying.', irrigation_status: 'Normal', irrigation_msg: 'Regular irrigation recommended.' }
+            };
+
+            const city = data.city || 'your area';
+            const temp = data.temperature;
+            const humidity = data.humidity;
+            const spray = (data.advisory && data.advisory.spraying_status) ? data.advisory.spraying_status : '';
+            const sprayMsg = (data.advisory && data.advisory.spraying_msg) ? data.advisory.spraying_msg : '';
+            const irrig = (data.advisory && data.advisory.irrigation_status) ? data.advisory.irrigation_status : '';
+            const irrigMsg = (data.advisory && data.advisory.irrigation_msg) ? data.advisory.irrigation_msg : '';
+
+            let spokenText = '';
+            if (currentLang === 'hi') {
+                spokenText = `${city} में वर्तमान तापमान ${temp} डिग्री सेल्सियस और आर्द्रता ${humidity} प्रतिशत है। छिड़काव परामर्श: ${spray}। ${sprayMsg}। सिंचाई परामर्श: ${irrig}। ${irrigMsg}`;
+            } else if (currentLang === 'bn') {
+                spokenText = `${city}-তে বর্তমান তাপমাত্রা ${temp} ডিগ্রি সেলসিয়াস এবং আর্দ্রতা ${humidity} শতাংশ। স্প্রে করার অবস্থা: ${spray}। ${sprayMsg}। সেচ পরামর্শ: ${irrig}। ${irrigMsg}`;
+            } else if (currentLang === 'te') {
+                spokenText = `${city} లో ప్రస్తుత ఉష్ణోగ్రత ${temp} డిగ్రీల సెల్సియస్, తేమ ${humidity} శాతం. పిచికారీ సలహా: ${spray}. ${sprayMsg}. నీటి యాజమాన్యం: ${irrig}. ${irrigMsg}`;
+            } else if (currentLang === 'mr') {
+                spokenText = `${city} मध्ये सध्याचे तापमान ${temp} अंश सेल्सिअस आणि आर्द्रता ${humidity} टक्के आहे. फवारणी सल्ला: ${spray}. ${sprayMsg}. पाणी व्यवस्थापन: ${irrig}. ${irrigMsg}`;
+            } else if (currentLang === 'ta') {
+                spokenText = `${city} இல் தற்போதைய வெப்பநிலை ${temp} டிகிரி செல்சியஸ் மற்றும் ஈரப்பதம் ${humidity} சதவீதம். தெளிப்பு நிலை: ${spray}. ${sprayMsg}. பாசன ஆலோசனை: ${irrig}. ${irrigMsg}`;
+            } else {
+                spokenText = `In ${city}, the temperature is ${temp} degrees Celsius with ${humidity} percent relative humidity. Spraying advisory: ${spray}. ${sprayMsg}. Irrigation recommendation: ${irrig}. ${irrigMsg}`;
+            }
+
+            isSpeakingWeather = true;
+            if (btn) btn.classList.add('speaking');
+            if (icon) icon.innerText = '⏹';
+            if (textEl) textEl.innerText = dict.audio ? dict.audio.weatherStop.replace('⏹ ', '') : 'Stop Voice';
+
+            window.krishiVoice.speakText(spokenText, () => {
+                isSpeakingWeather = false;
+                if (btn) btn.classList.remove('speaking');
+                if (icon) icon.innerText = '🔊';
+                if (textEl) textEl.innerText = dict.audio ? dict.audio.weatherBtn.replace('🔊 ', '') : 'Listen to Advisory';
+            });
+        }
+
+        let isSpeakingPred = false;
+        function speakPredictionAdvisory() {
+            if (!window.krishiVoice || !activeCropContext) return;
+            const btn = document.getElementById('btnListenPrediction');
+            const icon = document.getElementById('listenPredIcon');
+            const textEl = document.getElementById('listenPredText');
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
+
+            if (isSpeakingPred || window.krishiVoice.isSpeaking()) {
+                window.krishiVoice.stopSpeaking();
+                isSpeakingPred = false;
+                if (btn) btn.classList.remove('speaking');
+                if (icon) icon.innerText = '🔊';
+                if (textEl) textEl.innerText = dict.audio ? dict.audio.predBtn.replace('🔊 ', '') : 'Listen to Advisory';
+                return;
+            }
+
+            const localizedCrop = (dict.crops && dict.crops[activeCropContext]) ? dict.crops[activeCropContext] : activeCropContext;
+            let spokenText = '';
+            if (currentLang === 'hi') {
+                spokenText = `आपकी मिट्टी के पोषक तत्वों और स्थानीय जलवायु के अनुसार सर्वोत्तम अनुशंसित फसल ${localizedCrop} है। यह फसल वर्तमान परिस्थितियों के लिए गणितीय रूप से अनुकूलतम है। पैकेज ऑफ प्रैक्टिस के लिए एआई कृषि साथी से पूछें।`;
+            } else if (currentLang === 'bn') {
+                spokenText = `আপনার মাটির পুষ্টি ও স্থানীয় আবহাওয়ার জন্য সর্বাধিক উপযুক্ত ফসল হলো ${localizedCrop}। বিস্তারিত জানতে এআই কৃষি সাথীকে জিজ্ঞাসা করুন।`;
+            } else if (currentLang === 'te') {
+                spokenText = `మీ నేల మరియు వాతావరణ పరిస్థితులకు అత్యంత అనుకూలమైన పంట ${localizedCrop}. సమగ్ర సాగు వివరాల కోసం ఏఐ వ్యవసాయ సహాయకుడిని అడగండి.`;
+            } else if (currentLang === 'mr') {
+                spokenText = `तुमच्या शेतातील मातीचे घटक आणि हवामानानुसार सर्वोत्तम शिफारस केलेले पीक ${localizedCrop} आहे. अधिक मार्गदर्शनासाठी कृषी साथीचा सल्ला घ्या.`;
+            } else if (currentLang === 'ta') {
+                spokenText = `உங்கள் மண் மற்றும் தட்பவெப்ப நிலைக்கு மிகவும் பரிந்துரைக்கப்படும் பயிர் ${localizedCrop} ஆகும். மேலதிக ஆலோசனைகளுக்கு ஏஐ வேளாண் உதவியாளரிடம் கேளுங்கள்.`;
+            } else {
+                spokenText = `The optimal crop recommended for your soil and climate is ${localizedCrop}. This crop matches your soil N-P-K nutrient balance and local meteorological profile. Ask the AI Copilot for complete package of practices.`;
+            }
+
+            isSpeakingPred = true;
+            if (btn) btn.classList.add('speaking');
+            if (icon) icon.innerText = '⏹';
+            if (textEl) textEl.innerText = dict.audio ? dict.audio.predStop.replace('⏹ ', '') : 'Stop Voice';
+
+            window.krishiVoice.speakText(spokenText, () => {
+                isSpeakingPred = false;
+                if (btn) btn.classList.remove('speaking');
+                if (icon) icon.innerText = '🔊';
+                if (textEl) textEl.innerText = dict.audio ? dict.audio.predBtn.replace('🔊 ', '') : 'Listen to Advisory';
+            });
         }
 
         let isSpeakingDiagnosis = false;
@@ -640,28 +833,32 @@
 
         function speakMessage(text, btnElement) {
             if (!window.krishiVoice) return;
+            const dict = KRISHI_TRANSLATIONS[currentLang] || KRISHI_TRANSLATIONS.en;
+            const listenLabel = dict.audio ? dict.audio.listen.replace('🔊 ', '') : 'Listen';
+            const stopLabel = dict.audio ? dict.audio.stop.replace('⏹ ', '') : 'Stop';
+
             if (btnElement && btnElement.classList.contains('speaking')) {
                 window.krishiVoice.stopSpeaking();
                 btnElement.classList.remove('speaking');
-                btnElement.innerHTML = '<span>🔊</span> Listen';
+                btnElement.innerHTML = `<span>🔊</span> <span class="speech-btn-label">${listenLabel}</span>`;
                 return;
             }
 
             // Reset any other speaking buttons
             document.querySelectorAll('.btn-speech.speaking').forEach(b => {
                 b.classList.remove('speaking');
-                b.innerHTML = '<span>🔊</span> Listen';
+                b.innerHTML = `<span>🔊</span> <span class="speech-btn-label">${listenLabel}</span>`;
             });
 
             if (btnElement) {
                 btnElement.classList.add('speaking');
-                btnElement.innerHTML = '<span>⏹</span> Stop';
+                btnElement.innerHTML = `<span>⏹</span> <span class="speech-btn-label">${stopLabel}</span>`;
             }
 
             window.krishiVoice.speakText(text, () => {
                 if (btnElement) {
                     btnElement.classList.remove('speaking');
-                    btnElement.innerHTML = '<span>🔊</span> Listen';
+                    btnElement.innerHTML = `<span>🔊</span> <span class="speech-btn-label">${listenLabel}</span>`;
                 }
             });
         }
@@ -1044,11 +1241,11 @@
 
             // Add audio readout speaker button for copilot messages
             if (sender === 'copilot') {
-                const speechContent = (text + (action ? '. ' + action : '')).replace(/"/g, '&quot;');
+                const listenLabel = dict.audio ? dict.audio.listen.replace('🔊 ', '') : 'Listen';
                 html += `
                     <div class="chat-bubble-actions">
                         <button type="button" class="btn-speech" onclick="speakMessage(decodeURIComponent('${encodeURIComponent(text + (action ? '. ' + action : ''))}'), this)">
-                            <span>🔊</span> Listen
+                            <span>🔊</span> <span class="speech-btn-label">${listenLabel}</span>
                         </button>
                     </div>
                 `;
@@ -1057,6 +1254,12 @@
             bubble.innerHTML = html;
             container.appendChild(bubble);
             container.scrollTop = container.scrollHeight;
+
+            // If auto-voice is enabled and message is from Copilot, automatically read aloud
+            if (sender === 'copilot' && autoVoiceEnabled) {
+                const speechBtn = bubble.querySelector('.btn-speech');
+                speakMessage(text + (action ? '. ' + action : ''), speechBtn);
+            }
         }
 
         function appendLoadingMessage() {

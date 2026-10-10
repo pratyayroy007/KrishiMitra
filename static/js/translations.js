@@ -127,6 +127,18 @@ const KRISHI_TRANSLATIONS = {
             Cotton: "Cotton",
             Jute: "Jute",
             Coffee: "Coffee"
+        },
+        audio: {
+            guideBtn: "🔊 Voice Guide",
+            guideSpeech: "Welcome to Krishi Mitra, your AI Agricultural Extension Agent. Grounded on ICAR package of practices, real-time agro-climate intelligence, and optical leaf disease diagnosis. How may I assist your farm today?",
+            weatherBtn: "🔊 Listen to Advisory",
+            weatherStop: "⏹ Stop Voice",
+            predBtn: "🔊 Listen to Advisory",
+            predStop: "⏹ Stop Voice",
+            listen: "🔊 Listen",
+            stop: "⏹ Stop",
+            autoVoiceOn: "🔊 Auto Voice: ON",
+            autoVoiceOff: "🔇 Auto Voice: OFF"
         }
     },
 
@@ -247,6 +259,18 @@ const KRISHI_TRANSLATIONS = {
             Cotton: "कपास",
             Jute: "जूट (पटसन)",
             Coffee: "कॉफी"
+        },
+        audio: {
+            guideBtn: "🔊 ध्वनि सहायक",
+            guideSpeech: "कृषि मित्र में आपका स्वागत है। आपका एआई कृषि विस्तार एजेंट। भाकृअनुप (ICAR) पैकेज ऑफ प्रैक्टिस और सजीव मौसम बुद्धिमत्ता पर आधारित। आप मौसम रिपोर्ट, फसल अनुशंसा और पत्ती रोग स्कैनर का लाभ ले सकते हैं।",
+            weatherBtn: "🔊 मौसम परामर्श सुनें",
+            weatherStop: "⏹ आवाज़ रोकें",
+            predBtn: "🔊 फसल सलाह सुनें",
+            predStop: "⏹ आवाज़ रोकें",
+            listen: "🔊 सुनें",
+            stop: "⏹ रोकें",
+            autoVoiceOn: "🔊 आवाज़: चालू",
+            autoVoiceOff: "🔇 आवाज़: बंद"
         }
     },
 
@@ -367,6 +391,18 @@ const KRISHI_TRANSLATIONS = {
             Cotton: "তুলা",
             Jute: "পাট",
             Coffee: "কফি"
+        },
+        audio: {
+            guideBtn: "🔊 শব্দ সহায়ক",
+            guideSpeech: "কৃষি মিত্রে আপনাকে স্বাগতম। আপনার এআই কৃষি সম্প্রসারণ সহযোগী। আইসিএআর অনুমোদিত প্যাকেজ অফ প্র্যাকটিস এবং আবহাওয়া তথ্যের ওপর প্রতিষ্ঠিত। আবহাওয়া পূর্বাভাস, ফসলের পরামর্শ এবং পাতার রোগ নির্ণয়ের সুবিধা নিন।",
+            weatherBtn: "🔊 আবহাওয়া পরামর্শ শুনুন",
+            weatherStop: "⏹ শব্দ থামান",
+            predBtn: "🔊 ফসলের পরামর্শ শুনুন",
+            predStop: "⏹ শব্দ থামান",
+            listen: "🔊 শুনুন",
+            stop: "⏹ থামুন",
+            autoVoiceOn: "🔊 শব্দ: চালু",
+            autoVoiceOff: "🔇 শব্দ: বন্ধ"
         }
     },
 
@@ -487,6 +523,18 @@ const KRISHI_TRANSLATIONS = {
             Cotton: "పత్తి",
             Jute: "జనపనార",
             Coffee: "కాఫీ"
+        },
+        audio: {
+            guideBtn: "🔊 వాయిస్ గైడ్",
+            guideSpeech: "కృషి మిత్రకు స్వాగతం. మీ కృత్రిమ మేధ వ్యవసాయ సహాయకుడు. ఐసీఏఆర్ పద్ధతులు, నిజ-సమయ వాతావరణ సమాచారం మరియు ఆకు తెగుళ్ళ నిర్ధారణ ఆధారంగా పనిచేస్తుంది.",
+            weatherBtn: "🔊 వాతావరణ సలహా వినండి",
+            weatherStop: "⏹ ఆపండి",
+            predBtn: "🔊 పంట సలహా వినండి",
+            predStop: "⏹ ఆపండి",
+            listen: "🔊 వినండి",
+            stop: "⏹ ఆపండి",
+            autoVoiceOn: "🔊 వాయిస్: ఆన్",
+            autoVoiceOff: "🔇 వాయిస్: ఆఫ్"
         }
     },
 
@@ -607,6 +655,18 @@ const KRISHI_TRANSLATIONS = {
             Cotton: "कापूस",
             Jute: "ताग",
             Coffee: "कॉफी"
+        },
+        audio: {
+            guideBtn: "🔊 ध्वनी मार्गदर्शक",
+            guideSpeech: "कृषी मित्र मध्ये आपले स्वागत आहे. आपला एआई कृषी विस्तार सहाय्यक. आयसीएआर पॅकेज ऑफ प्रॅक्टिस आणि थेट हवामान माहितीवर आधारित. हवामान, पीक शिफारस आणि पानांचे रोग तपासणीसाठी याचा वापर करा.",
+            weatherBtn: "🔊 हवामान सल्ला ऐका",
+            weatherStop: "⏹ आवाज थांबवा",
+            predBtn: "🔊 पीक सल्ला ऐका",
+            predStop: "⏹ आवाज थांबवा",
+            listen: "🔊 ऐका",
+            stop: "⏹ थांबवा",
+            autoVoiceOn: "🔊 आवाज: चालू",
+            autoVoiceOff: "🔇 आवाज: बंद"
         }
     },
 
@@ -727,6 +787,18 @@ const KRISHI_TRANSLATIONS = {
             Cotton: "பருத்தி",
             Jute: "சணல்",
             Coffee: "காபி"
+        },
+        audio: {
+            guideBtn: "🔊 குரல் வழிகாட்டி",
+            guideSpeech: "கிருஷி மித்ராவிற்கு நல்வரவு. உங்கள் ஏஐ வேளாண் விரிவாக்க முகவர். ஐசிஏஆர் நடைமுறைகள், நேரடி வானிலை மற்றும் இலை நோய் கண்டறிதல் ஆகியவற்றின் அடிப்படையில் செயல்படுகிறது.",
+            weatherBtn: "🔊 வானிலை ஆலோசனை கேளுங்கள்",
+            weatherStop: "⏹ குரலை நிறுத்து",
+            predBtn: "🔊 பயிர் ஆலோசனை கேளுங்கள்",
+            predStop: "⏹ குரலை நிறுத்து",
+            listen: "🔊 கேளுங்கள்",
+            stop: "⏹ நிறுத்து",
+            autoVoiceOn: "🔊 குரல்: ஆன்",
+            autoVoiceOff: "🔇 குரல்: ஆஃப்"
         }
     }
 };
@@ -741,7 +813,25 @@ class KrishiVoiceEngine {
         this.isListening = false;
         this.synth = window.speechSynthesis || null;
         this.activeUtterance = null;
+        this.voices = [];
+        this.autoVoice = false;
+        this._initVoices();
         this._initSpeechRecognition();
+    }
+
+    _initVoices() {
+        if (!this.synth) return;
+        const load = () => {
+            try {
+                this.voices = this.synth.getVoices() || [];
+            } catch (e) {
+                console.warn("Could not load voices", e);
+            }
+        };
+        load();
+        if (this.synth.onvoiceschanged !== undefined) {
+            this.synth.onvoiceschanged = load;
+        }
     }
 
     _initSpeechRecognition() {
@@ -766,7 +856,7 @@ class KrishiVoiceEngine {
             };
 
             this.recognition.onerror = (event) => {
-                console.warn("Speech recognition error:", event.error);
+                console.warn("Speech recognition notice:", event.error);
                 this.stopListening();
             };
 
@@ -781,7 +871,7 @@ class KrishiVoiceEngine {
         this.currentLang = langCode || 'en';
         if (this.recognition) {
             const langData = KRISHI_TRANSLATIONS[this.currentLang] || KRISHI_TRANSLATIONS.en;
-            this.recognition.lang = langData.speechCode;
+            this.recognition.lang = langData.speechCode || 'en-IN';
         }
         this.stopSpeaking();
     }
@@ -801,17 +891,19 @@ class KrishiVoiceEngine {
     startListening() {
         if (!this.recognition) return;
         const langData = KRISHI_TRANSLATIONS[this.currentLang] || KRISHI_TRANSLATIONS.en;
-        this.recognition.lang = langData.speechCode;
+        this.recognition.lang = langData.speechCode || 'en-IN';
         try {
             this.recognition.start();
         } catch (e) {
-            console.warn("Recognition already started", e);
+            console.warn("Recognition start info:", e);
         }
     }
 
     stopListening() {
         if (this.recognition && this.isListening) {
-            this.recognition.stop();
+            try {
+                this.recognition.stop();
+            } catch (e) {}
         }
         this.isListening = false;
         this._updateMicUI(false);
@@ -840,27 +932,69 @@ class KrishiVoiceEngine {
         }
     }
 
+    _getBestVoice(langCode) {
+        if (!this.voices || this.voices.length === 0) {
+            if (this.synth) this.voices = this.synth.getVoices() || [];
+        }
+        const langData = KRISHI_TRANSLATIONS[langCode] || KRISHI_TRANSLATIONS.en;
+        const targetCode = (langData.speechCode || 'en-IN').toLowerCase();
+
+        // 1. Exact match on target speechCode
+        let match = this.voices.find(v => (v.lang || '').toLowerCase().replace('_', '-') === targetCode);
+        if (match) return match;
+
+        // 2. Language prefix match (e.g. 'hi', 'bn', 'te')
+        match = this.voices.find(v => (v.lang || '').toLowerCase().startsWith(langCode.toLowerCase()));
+        if (match) return match;
+
+        // 3. Name keyword matching
+        const keywords = {
+            hi: ['hindi', 'hemant', 'kalpana', 'madhur', 'swara'],
+            bn: ['bengali', 'bangla', 'tapan', 'anamika', 'bashkar'],
+            te: ['telugu', 'mohan', 'shruti', 'chitra'],
+            mr: ['marathi', 'aarohi', 'manohar'],
+            ta: ['tamil', 'valluvar', 'saranya', 'pallavi'],
+            en: ['india', 'heera', 'ravi', 'neerja', 'english']
+        };
+        const words = keywords[langCode] || ['india'];
+        match = this.voices.find(v => {
+            const name = (v.name || '').toLowerCase();
+            return words.some(w => name.includes(w));
+        });
+        if (match) return match;
+
+        // 4. Any Indian dialect voice
+        match = this.voices.find(v => (v.lang || '').toLowerCase().includes('in'));
+        if (match) return match;
+
+        // 5. Default browser voice
+        return this.voices[0] || null;
+    }
+
     speakText(text, onEndCallback) {
         if (!this.synth) {
             console.warn("Text-to-Speech not supported.");
+            if (onEndCallback) onEndCallback();
             return;
         }
         this.stopSpeaking();
 
-        if (!text || !text.trim()) return;
+        if (!text || !text.trim()) {
+            if (onEndCallback) onEndCallback();
+            return;
+        }
 
-        // Clean markdown tags for natural speech
-        const cleanText = text.replace(/[*#_`]/g, '').trim();
+        // Clean markdown tags & special characters
+        const cleanText = text.replace(/[*#_`]/g, '').replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ').trim();
         const utterance = new SpeechSynthesisUtterance(cleanText);
         const langData = KRISHI_TRANSLATIONS[this.currentLang] || KRISHI_TRANSLATIONS.en;
-        utterance.lang = langData.speechCode;
-        utterance.rate = 0.95; // Slightly slower for clear regional speech
+        utterance.lang = langData.speechCode || 'en-IN';
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
 
-        // Pick best matching voice if available
-        const voices = this.synth.getVoices();
-        const matchedVoice = voices.find(v => v.lang.startsWith(this.currentLang) || v.lang === langData.speechCode);
-        if (matchedVoice) {
-            utterance.voice = matchedVoice;
+        const bestVoice = this._getBestVoice(this.currentLang);
+        if (bestVoice) {
+            utterance.voice = bestVoice;
         }
 
         utterance.onend = () => {
@@ -868,24 +1002,33 @@ class KrishiVoiceEngine {
             if (onEndCallback) onEndCallback();
         };
 
-        utterance.onerror = () => {
+        utterance.onerror = (e) => {
+            console.warn("Speech synthesis notice:", e);
             this.activeUtterance = null;
             if (onEndCallback) onEndCallback();
         };
 
         this.activeUtterance = utterance;
-        this.synth.speak(utterance);
+        try {
+            this.synth.speak(utterance);
+        } catch (err) {
+            console.warn("Error triggering speak:", err);
+            this.activeUtterance = null;
+            if (onEndCallback) onEndCallback();
+        }
     }
 
     stopSpeaking() {
         if (this.synth) {
-            this.synth.cancel();
+            try {
+                this.synth.cancel();
+            } catch (e) {}
             this.activeUtterance = null;
         }
     }
 
     isSpeaking() {
-        return this.synth && this.synth.speaking;
+        return this.synth && (this.synth.speaking || this.activeUtterance !== null);
     }
 }
 
