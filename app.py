@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 import pandas as pd
 import requests
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -104,6 +104,42 @@ def api_weather():
     result = weather_service.get_weather(city=city, lat=lat, lon=lon)
     status_code = 200 if result.get('status') == 'success' else 400
     return jsonify(result), status_code
+
+
+# -------------------------------------------------------------
+# 🔊 MULTI-LANGUAGE HIGH-FIDELITY TEXT-TO-SPEECH (TTS) ENDPOINT
+# -------------------------------------------------------------
+TTS_CACHE = {}
+
+@app.route('/api/tts', methods=['GET'])
+def api_tts():
+    text = request.args.get('text', '').strip()
+    lang = request.args.get('lang', 'en').strip().lower()
+    if not text:
+        return jsonify({"error": "Empty text"}), 400
+
+    clean_text = text.replace('*', '').replace('#', '').replace('_', '').replace('`', '')
+    if len(clean_text) > 195:
+        clean_text = clean_text[:190] + "..."
+
+    cache_key = f"{lang}:{clean_text}"
+    if cache_key in TTS_CACHE:
+        return Response(TTS_CACHE[cache_key], mimetype="audio/mpeg")
+
+    try:
+        import urllib.parse
+        encoded_q = urllib.parse.quote(clean_text)
+        url = f"https://translate.google.com/translate_tts?ie=UTF-8&q={encoded_q}&tl={lang}&client=tw-ob"
+        resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=6)
+        if resp.status_code == 200 and resp.content:
+            if len(TTS_CACHE) > 300:
+                TTS_CACHE.clear()
+            TTS_CACHE[cache_key] = resp.content
+            return Response(resp.content, mimetype="audio/mpeg")
+    except Exception as e:
+        pass
+
+    return jsonify({"error": "TTS synthesis failed"}), 502
 
 
 if __name__ == '__main__':

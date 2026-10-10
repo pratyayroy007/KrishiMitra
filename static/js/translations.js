@@ -972,11 +972,6 @@ class KrishiVoiceEngine {
     }
 
     speakText(text, onEndCallback) {
-        if (!this.synth) {
-            console.warn("Text-to-Speech not supported.");
-            if (onEndCallback) onEndCallback();
-            return;
-        }
         this.stopSpeaking();
 
         if (!text || !text.trim()) {
@@ -986,16 +981,69 @@ class KrishiVoiceEngine {
 
         // Clean markdown tags & special characters
         const cleanText = text.replace(/[*#_`]/g, '').replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ').trim();
+        const shortText = cleanText.length > 190 ? cleanText.substring(0, 185) + '...' : cleanText;
+        const langCode = this.currentLang || 'en';
+
+        // 1. High-Fidelity Native TTS Stream (/api/tts)
+        // Works 100% reliably for Bengali, Telugu, Tamil, Marathi, Hindi, and English without Windows voice pack dependencies.
+        try {
+            const audioUrl = `/api/tts?text=${encodeURIComponent(shortText)}&lang=${encodeURIComponent(langCode)}`;
+            const audio = new Audio(audioUrl);
+            this.currentAudio = audio;
+
+            audio.onended = () => {
+                this.currentAudio = null;
+                if (onEndCallback) onEndCallback();
+            };
+
+            audio.onerror = () => {
+                this.currentAudio = null;
+                this._speakViaWebSpeech(cleanText, onEndCallback);
+            };
+
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch((err) => {
+                    this.currentAudio = null;
+                    this._speakViaWebSpeech(cleanText, onEndCallback);
+                });
+            }
+        } catch (err) {
+            this._speakViaWebSpeech(cleanText, onEndCallback);
+        }
+    }
+
+    _speakViaWebSpeech(cleanText, onEndCallback) {
+        if (!this.synth) {
+            console.warn("Speech synthesis not supported.");
+            if (onEndCallback) onEndCallback();
+            return;
+        }
+
         const utterance = new SpeechSynthesisUtterance(cleanText);
         const langData = KRISHI_TRANSLATIONS[this.currentLang] || KRISHI_TRANSLATIONS.en;
-        utterance.lang = langData.speechCode || 'en-IN';
-        utterance.rate = 0.95;
-        utterance.pitch = 1.0;
-
         const bestVoice = this._getBestVoice(this.currentLang);
+
         if (bestVoice) {
             utterance.voice = bestVoice;
+            utterance.lang = bestVoice.lang || langData.speechCode || 'en-IN';
+        } else {
+            // For Marathi, Hindi voice can pronounce Devanagari smoothly
+            if (this.currentLang === 'mr') {
+                const hiVoice = this._getBestVoice('hi');
+                if (hiVoice) {
+                    utterance.voice = hiVoice;
+                    utterance.lang = hiVoice.lang || 'hi-IN';
+                } else {
+                    utterance.lang = 'hi-IN';
+                }
+            } else {
+                utterance.lang = langData.speechCode || 'en-IN';
+            }
         }
+
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
 
         utterance.onend = () => {
             this.activeUtterance = null;
@@ -1003,7 +1051,7 @@ class KrishiVoiceEngine {
         };
 
         utterance.onerror = (e) => {
-            console.warn("Speech synthesis notice:", e);
+            console.warn("Web Speech notice:", e);
             this.activeUtterance = null;
             if (onEndCallback) onEndCallback();
         };
@@ -1012,13 +1060,19 @@ class KrishiVoiceEngine {
         try {
             this.synth.speak(utterance);
         } catch (err) {
-            console.warn("Error triggering speak:", err);
             this.activeUtterance = null;
             if (onEndCallback) onEndCallback();
         }
     }
 
     stopSpeaking() {
+        if (this.currentAudio) {
+            try {
+                this.currentAudio.pause();
+                this.currentAudio.currentTime = 0;
+            } catch (e) {}
+            this.currentAudio = null;
+        }
         if (this.synth) {
             try {
                 this.synth.cancel();
@@ -1028,7 +1082,9 @@ class KrishiVoiceEngine {
     }
 
     isSpeaking() {
-        return this.synth && (this.synth.speaking || this.activeUtterance !== null);
+        const audioPlaying = this.currentAudio && !this.currentAudio.paused && !this.currentAudio.ended;
+        const synthSpeaking = this.synth && this.synth.speaking;
+        return Boolean(audioPlaying || synthSpeaking);
     }
 }
 

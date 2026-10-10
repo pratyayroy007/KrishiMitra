@@ -23,7 +23,14 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 # Fallback Grounded Agricultural Knowledge Base
 AGRICULTURAL_KNOWLEDGE_BASE = {
     "rice_blast": {
-        "keywords": ["blast", "rice blast", "magnaporthe", "spindle lesion", "paddy blast", "neck blast"],
+        "keywords": [
+            "blast", "rice blast", "magnaporthe", "spindle lesion", "paddy blast", "neck blast", "rice", "paddy",
+            "धान", "चावल", "झुलसा", "ब्लास्ट", "गर्दन तोड़",
+            "ধান", "ব্লাস্ট", "শীষ ব্লাস্ট", "পাতা পোড়া", "চাল", "ধানের",
+            "వరి", "బ్లాస్ట్", "అగ్గి తెగులు", "మెడ విరుపు", "వరి ధాన్యం",
+            "भात", "करपा", "तांदूळ", "ब्लास्ट रोग", "भाताचा",
+            "நெல்", "குலை நோய்", "அரிசி", "இலை கருகல்", "நெற்பயிர்"
+        ],
         "answer": (
             "Rice Blast (caused by Magnaporthe oryzae) produces spindle-shaped lesions with grayish centers "
             "and brown margins on leaves, and blackening at node/neck joints. High relative humidity (>90%) "
@@ -37,7 +44,14 @@ AGRICULTURAL_KNOWLEDGE_BASE = {
         "context_tags": ["Paddy", "FungalDisease", "BlastManagement", "IPM"]
     },
     "soil_npk": {
-        "keywords": ["npk", "nitrogen", "phosphorus", "potassium", "fertilizer", "soil health", "urea", "dap"],
+        "keywords": [
+            "npk", "nitrogen", "phosphorus", "potassium", "fertilizer", "soil health", "urea", "dap", "dose", "nutrient",
+            "एनपीके", "नाइट्रोजन", "फास्फोरस", "पोटाश", "उर्वरक", "खाद", "यूरिया", "डीएपी", "मिट्टी की सेहत", "पोषक तत्व",
+            "সার", "নাইট্রোজেন", "ফসফরাস", "পটাশ", "ইউরিয়া", "ডিএপি", "মাটির স্বাস্থ্য", "পুষ্টি উপাদান", "এনপিকে",
+            "ఎరువులు", "నత్రజని", "భాస్వరం", "పొటాష్", "యూరియా", "భూసారం", "పోషకాలు",
+            "खते", "नत्र", "स्फुरद", "पालाश", "युरिया", "मातीचे आरोग्य", "पोषण",
+            "உரம்", "தழைச்சத்து", "மணிச்சத்து", "சாம்பல்சத்து", "யூரியா", "மண் வளம்", "ஊட்டச்சத்து"
+        ],
         "answer": (
             "Balanced fertilizer application depends on soil test values. Standard general recommendations:\n"
             "- Cereal crops (Rice, Wheat, Maize): 120:60:40 kg/ha (N:P2O5:K2O).\n"
@@ -51,7 +65,14 @@ AGRICULTURAL_KNOWLEDGE_BASE = {
         "context_tags": ["SoilHealth", "NPKRatio", "NutrientManagement", "Fertilizer"]
     },
     "soil_ph": {
-        "keywords": ["ph", "acidic soil", "alkaline soil", "soil acidity", "saline soil", "lime", "gypsum"],
+        "keywords": [
+            "ph", "acidic soil", "alkaline soil", "soil acidity", "saline soil", "lime", "gypsum", "soil",
+            "पीएच", "अम्लीय मिट्टी", "क्षारीय मिट्टी", "मृदा", "चूना", "जिप्सम",
+            "পিএইচ", "অম্লীয় মাটি", "ক্ষারীয় মাটি", "মাটির অম্লতা", "চুন", "জিপসাম", "মাটি",
+            "పీహెచ్", "ఆమ్ల నేల", "క్షార నేల", "భూమి", "సున్నం", "జిప్సం",
+            "पीएच", "आम्लधर्मी जमीन", "क्षारयुक्त जमीन", "माती", "सुना", "जिप्सम",
+            "மண் கார அமில நிலை", "அமில மண்", "கார மண்", "மண்", "சுண்ணாம்பு"
+        ],
         "answer": (
             "Optimal soil pH for most crops is 6.0 to 7.5. "
             "Acidic soils (pH < 6.0) restrict Phosphorus and Magnesium availability, while alkaline soils (pH > 8.0) "
@@ -64,7 +85,14 @@ AGRICULTURAL_KNOWLEDGE_BASE = {
         "context_tags": ["SoilpH", "SoilReclamation", "LimeGypsum", "Agronomy"]
     },
     "tomato_blight": {
-        "keywords": ["tomato", "early blight", "late blight", "alternaria", "phytophthora", "leaf spot"],
+        "keywords": [
+            "tomato", "early blight", "late blight", "alternaria", "phytophthora", "leaf spot", "damping off",
+            "टमाटर", "अगेती झुलसा", "पछेती झुलसा", "पत्ती धब्बा",
+            "টমেটো", "ব্লাইট", "নাভি ধসা", "আগাম ধসা", "পাতার দাগ",
+            "టమోటా", "ఆకు మచ్చ తెగులు", "మాడు తెగులు",
+            "टोमॅटो", "करपा", "पानावरील डाग",
+            "தக்காளி", "இலைப்புள்ளி", "கருகல் நோய்"
+        ],
         "answer": (
             "Tomato Late Blight (Phytophthora infestans) causes water-soaked pale lesions turning dark brown/purplish, "
             "with white fungal bloom under leaf surfaces during cool humid weather. "
@@ -78,7 +106,14 @@ AGRICULTURAL_KNOWLEDGE_BASE = {
         "context_tags": ["Horticulture", "Tomato", "BlightControl", "Fungicide"]
     },
     "cotton_pest": {
-        "keywords": ["cotton", "bollworm", "whitefly", "pink bollworm", "leaf curl", "pest control"],
+        "keywords": [
+            "cotton", "bollworm", "whitefly", "pink bollworm", "leaf curl", "pest control", "insect", "bug",
+            "कपास", "गुलाबी सुंडी", "सफेद मक्खी", "कीट", "कीड़ा",
+            "তুলা", "কীটপতঙ্গ", "সাদা মাছি", "লেদা পোকা", "পোকা দমন",
+            "పత్తి", "గులాబీ రంగు పురుగు", "తెల్లదోమ", "పురుగులు",
+            "कापूस", "बोंडअळी", "पांढरी माशी", "कीड",
+            "பருத்தி", "காய் புழு", "வெள்ளை ஈ", "பூச்சி"
+        ],
         "answer": (
             "Cotton is prone to Pink Bollworm (Pectinophora gossypiella) and Whitefly (Bemisia tabaci), "
             "which also vectors Cotton Leaf Curl Virus (CLCuV). High sucking pest pressure leads to honeydew "
@@ -92,7 +127,14 @@ AGRICULTURAL_KNOWLEDGE_BASE = {
         "context_tags": ["CashCrops", "Cotton", "IPM", "PheromoneTraps"]
     },
     "drip_irrigation": {
-        "keywords": ["irrigation", "water", "drip", "sprinkler", "water saving", "drought", "moisture"],
+        "keywords": [
+            "irrigation", "water", "drip", "sprinkler", "water saving", "drought", "moisture",
+            "सिंचाई", "ड्रिप", "फव्वारा", "पानी", "टपक सिंचाई", "नमी",
+            "সেচ", "ড্রিপ সেচ", "জল সাশ্রয়", "পানি", "সেচ ব্যবস্থা",
+            "నీటిపారుదల", "బిందు సేద్యం", "స్ప్రింక్లర్", "నీరు", "తేమ",
+            "ठिबक सिंचन", "तुषार सिंचन", "पाणी नियोजन", "ओलावा",
+            "சொட்டு நீர் பாசனம்", "தெளிப்பு நீர் பாசனம்", "பாசனம்", "ஈரப்பதம்"
+        ],
         "answer": (
             "Micro-irrigation (Drip & Sprinkler) saves 30–50% water while improving fertilizer use efficiency (fertigation) "
             "by 25–35%. Critical moisture stages: Crown root initiation in wheat, flowering/pod filling in pulses, "
@@ -186,7 +228,7 @@ class KrishiMitraCopilotService:
                 executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
                 try:
                     future = executor.submit(_call_gemini)
-                    response = future.result(timeout=2.5)
+                    response = future.result(timeout=8.0)
                 finally:
                     executor.shutdown(wait=False, cancel_futures=True)
 
