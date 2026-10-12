@@ -18,10 +18,18 @@ from typing import Any, Dict, Optional
 from dotenv import load_dotenv
 from PIL import Image
 
-import torch
-import torch.nn as nn
-from torchvision import transforms
-from torchvision.models import mobilenet_v3_small
+try:
+    import torch
+    import torch.nn as nn
+    from torchvision import transforms
+    from torchvision.models import mobilenet_v3_small
+    TORCH_AVAILABLE = True
+except ImportError:
+    torch = None
+    nn = None
+    transforms = None
+    mobilenet_v3_small = None
+    TORCH_AVAILABLE = False
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -202,15 +210,18 @@ from services.translation_service import (
 
 class CropDiseaseService:
     def __init__(self):
-        self.device = torch.device('cpu')
+        self.device = torch.device('cpu') if (TORCH_AVAILABLE and torch) else 'cpu'
         self.pytorch_model = None
         self.class_indices = {}
         self.remedies = DEFAULT_DISEASE_REMEDIES
-        self.transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
+        if TORCH_AVAILABLE and transforms:
+            self.transform = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            ])
+        else:
+            self.transform = None
         
         self.client = None
         self._load_local_pytorch_model()
@@ -218,6 +229,9 @@ class CropDiseaseService:
 
     def _load_local_pytorch_model(self):
         """Attempts to load locally trained MobileNetV3 model if available."""
+        if not TORCH_AVAILABLE:
+            logger.info("Torch not installed in this environment; MobileNet local inference disabled.")
+            return
         model_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'model')
         weights_path = os.path.join(model_dir, 'plant_disease_model.pth')
         indices_path = os.path.join(model_dir, 'class_indices.json')
@@ -282,7 +296,7 @@ class CropDiseaseService:
             img = Image.open(io.BytesIO(img_bytes)).convert('RGB')
 
             # 1. Use Local PyTorch Deep Learning Model if available
-            if self.pytorch_model is not None:
+            if self.pytorch_model is not None and TORCH_AVAILABLE and torch is not None:
                 tensor = self.transform(img).unsqueeze(0).to(self.device)
                 with torch.no_grad():
                     logits = self.pytorch_model(tensor)
