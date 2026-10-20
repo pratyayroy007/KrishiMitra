@@ -1,5 +1,6 @@
 # 🌾 Krishi Mitra (कृषि मित्र) — Autonomous Agricultural AI Extension Agent
 
+[![CI](https://github.com/pratyayroy007/KrishiMitra/actions/workflows/ci.yml/badge.svg)](https://github.com/pratyayroy007/KrishiMitra/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Framework-Flask-green.svg)](https://flask.palletsprojects.com/)
 [![PyTorch](https://img.shields.io/badge/Vision-PyTorch%20MobileNetV2-red.svg)](https://pytorch.org/)
