@@ -1,4 +1,4 @@
-# 🌾 Krishi Mitra (कृषि मित्र) — Autonomous Agricultural AI Extension Agent
+#  Krishi Mitra (कृषि मित्र) — Autonomous Agricultural AI Extension Agent
 
 [![CI](https://github.com/pratyayroy007/KrishiMitra/actions/workflows/ci.yml/badge.svg)](https://github.com/pratyayroy007/KrishiMitra/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
@@ -12,26 +12,26 @@
 
 ---
 
-## 🏛️ The 4 Core System Pillars
+##  The 4 Core System Pillars
 
-### 1. 🌾 Pillar 1: Multi-Crop Recommendation Engine
+### 1.  Pillar 1: Multi-Crop Recommendation Engine
 - **Model**: Machine Learning Random Forest classifier.
 - **Inputs**: Soil Chemistry ($N, P, K$, soil $\text{pH}$) combined with atmospheric factors (temperature, relative humidity, growing rainfall).
 - **Hyper-Local Climate Integration**: Direct real-time GPS & district weather queries powered by **Open-Meteo API** (zero API keys required). Auto-fills live temperature, humidity, and rainfall into prediction forms with a single click.
 
-### 2. 🍃 Pillar 2: Real-Time Field Leaf Disease Detection (Computer Vision)
+### 2.  Pillar 2: Real-Time Field Leaf Disease Detection (Computer Vision)
 - **Deep Learning Model**: Lightweight **MobileNetV2** neural network trained on **19–20 plant pathology classes**.
 - **Supported Crops**: Rice, Potato, Tomato, Maize/Corn, Apple, Grape, Peach, Bell Pepper.
 - **Diagnostics**: Detects pathogens including Rice Blast, Potato Late Blight, Tomato Early Blight, Apple Scab, and Black Rot.
 - **Standalone CPU Inference**: Ultra-low latency (~25ms CPU inference) requiring no external drives or GPU instances.
 - **Prescriptive Output**: Instant actionable ICAR-approved chemical fungicides, dosages (e.g. Mancozeb, Tricyclazole), organic biocontrol options, and cultural prevention measures.
 
-### 3. 🤖 Pillar 3: Grounded Agronomic Advisory Copilot
+### 3.  Pillar 3: Grounded Agronomic Advisory Copilot
 - **AI Core**: **Google Gemini 3.8 Flash** with system prompts grounded on ICAR Package-of-Practices (PoP).
 - **Offline Zero-Latency Fail-Safe**: Built-in ICAR Agronomic Knowledge Base with a timeout protector guaranteeing instant fallback advice for critical crop issues even with zero internet connectivity.
 - **Context-Aware Recommendations**: Integrates active crop context (e.g. recommended crops or diagnosed leaves) directly into conversational advice.
 
-### 4. 🗣️ Pillar 4: Regional Languages & Vernacular Voice Assistant
+### 4.  Pillar 4: Regional Languages & Vernacular Voice Assistant
 - **6 Supported Languages**:
   - 🇬🇧 English (`en`, `en-IN`)
   - 🇮🇳 हिन्दी (Hindi - `hi`, `hi-IN`)
@@ -40,8 +40,8 @@
   - 🇮🇳 मराठी (Marathi - `mr`, `mr-IN`)
   - 🇮🇳 தமிழ் (Tamil - `ta`, `ta-IN`)
 - **Zero-Reload Dynamic UI**: Full-stack dynamic localization across the navbar, weather cards, forms, and results.
-- **🎙️ Speech-to-Text (STT)**: Web Speech API microphone input enabling farmers to speak queries naturally in their mother tongue.
-- **🔊 High-Fidelity Text-to-Speech (TTS) Streaming**: Dedicated `/api/tts` endpoint delivering fluent, native-accented audio readouts for:
+- ** Speech-to-Text (STT)**: Web Speech API microphone input enabling farmers to speak queries naturally in their mother tongue.
+- ** High-Fidelity Text-to-Speech (TTS) Streaming**: Dedicated `/api/tts` endpoint delivering fluent, native-accented audio readouts for:
   - Global Voice Guide walkthroughs
   - Live weather & spraying window advisories
   - Crop prediction rationale
@@ -50,7 +50,7 @@
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 | Layer | Technologies |
 | :--- | :--- |
@@ -64,7 +64,7 @@
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```text
 krishimitra/
@@ -101,7 +101,7 @@ krishimitra/
 
 ---
 
-## 🚀 Quick Start & Installation
+##  Quick Start & Installation
 
 ### Prerequisites
 - Python 3.10, 3.11, or 3.12 installed
@@ -135,7 +135,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 🧪 Testing & Verification
+##  Testing & Verification
 
 Run the automated test suites to verify system modules:
 
@@ -149,6 +149,6 @@ python test_disease_model.py hi
 
 ---
 
-## 📜 Academic Attribution & TARP Project
+##  Academic Attribution & TARP Project
 
 Developed as part of the **Final Year Technology Applied Research Project (TARP)**. Grounded on agronomic guidelines formulated by the **Indian Council of Agricultural Research (ICAR)** and regional State Agricultural Universities (SAUs).
